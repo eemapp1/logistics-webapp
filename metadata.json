@@ -1,0 +1,5 @@
+{
+  "name": "EEM Transport Manager",
+  "description": "Une application web professionnelle pour la gestion de colis, suivi financier et impression de tickets pour l'agence EEM Transport.",
+  "requestFramePermissions": []
+}

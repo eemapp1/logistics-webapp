@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EEM Transport - Gestion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['var(--font-family)', 'Inter', 'sans-serif'],
+            },
+            colors: {
+              // Map Tailwind colors to CSS variables for dynamic theming
+              primary: {
+                DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+                50: 'rgb(var(--color-primary) / 0.1)',
+                100: 'rgb(var(--color-primary) / 0.2)',
+                200: 'rgb(var(--color-primary) / 0.3)',
+                300: 'rgb(var(--color-primary) / 0.4)',
+                400: 'rgb(var(--color-primary) / 0.6)',
+                500: 'rgb(var(--color-primary) / 0.8)',
+                600: 'rgb(var(--color-primary) / 1)', // Main
+                700: 'rgb(var(--color-primary) / 0.9)',
+                800: 'rgb(var(--color-primary) / 0.95)',
+                900: 'rgb(var(--color-primary) / 1)',
+              },
+              slate: {
+                850: '#1e293b',
+                950: '#020617',
+              }
+            },
+            boxShadow: {
+              'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        /* Default "Medical/ERP" Blue: #4A90B8 -> 74, 144, 184 */
+        --color-primary: 74, 144, 184; 
+        --font-family: 'Source Sans Pro', sans-serif;
+      }
+
+      body { 
+        font-family: var(--font-family); 
+        background-color: #F5F8FA; /* Soft ERP Background */
+      }
+      
+      .dark body {
+        background-color: #0f172a;
+      }
+
+      @media print {
+        .no-print { display: none !important; }
+        .print-only { display: block !important; }
+        body { background-color: white !important; }
+      }
+      .print-only { display: none; }
+      
+      /* Scrollbar customization */
+      .custom-scrollbar::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #475569;
+      }
+
+      /* Card & Image Layout Enforcement */
+      .card-image-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .card-image-cover {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        padding: 0;
+        margin: 0;
+      }
+      
+      /* Force equal height for cards in grids */
+      .card-grid {
+        display: grid;
+        grid-auto-rows: 1fr;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "recharts": "https://esm.sh/recharts@^3.6.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.90.1"
+  }
+}
+</script>
+</head>
+  <body class="text-[#2E3A46] dark:text-slate-100 transition-colors duration-300">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
