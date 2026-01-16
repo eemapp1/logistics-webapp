@@ -335,7 +335,7 @@ export const NewShipment: React.FC = () => {
                     name="senderName" 
                     value={formData.senderName || ''} 
                     onChange={handleChange} 
-                    placeholder="ex: Ahmed Alami" 
+                    placeholder="ex: Mohamed Abasi" 
                     required 
                   />
                 </div>
