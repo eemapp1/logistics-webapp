@@ -377,8 +377,8 @@ export const CashRegister: React.FC = () => {
       {/* Header & Stats */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
          <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4 relative overflow-hidden group">
-            <div className="absolute right-0 top-0 h-full w-1 bg-green-500"></div>
-            <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400">
+            <div className="absolute right-0 top-0 h-full w-1 bg-emerald-600"></div>
+            <div className="p-3 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg text-emerald-600 dark:text-emerald-400">
                <Wallet size={24} />
             </div>
             <div>

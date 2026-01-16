@@ -319,7 +319,7 @@ export const NewShipment: React.FC = () => {
         <div className="lg:col-span-8 space-y-8">
           
           {/* 1. EXPÉDITEUR & DESTINATAIRE */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-300 dark:border-slate-700 p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               
               {/* SENDER */}
@@ -439,7 +439,7 @@ export const NewShipment: React.FC = () => {
             </div>
 
             {parcels.map((parcel, index) => (
-              <div key={index} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 relative animate-in slide-in-from-top-4 duration-300">
+              <div key={index} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-300 dark:border-slate-700 p-5 relative animate-in slide-in-from-top-4 duration-300">
                 {/* Remove Button */}
                 {parcels.length > 1 && (
                   <button 
@@ -529,7 +529,7 @@ export const NewShipment: React.FC = () => {
         {/* RIGHT COLUMN - PAYMENT & ACTIONS */}
         <div className="lg:col-span-4 space-y-6">
           
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 sticky top-24">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-300 dark:border-slate-700 p-6 sticky top-24">
              <SectionHeader title="Paiement" icon={<Wallet size={18} />} />
 
              <div className="space-y-5">

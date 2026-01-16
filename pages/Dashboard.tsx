@@ -153,7 +153,7 @@ export const Dashboard: React.FC = () => {
           amount={`${stats.cashMAD.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`} 
           icon={<Banknote size={24} />} 
           trend="Net"
-          color="bg-green-500"
+          color="bg-emerald-600"
         />
         <StatCard 
           title="Total Espèces (MAD)" 
