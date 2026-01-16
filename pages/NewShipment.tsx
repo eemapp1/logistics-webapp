@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { PaymentMethod, Shipment, Currency, PaymentStatus, Parcel } from '../types';
 import { printReceipt, printLabel } from '../services/printService';
+import { generateBLCode, generateClientCode } from '../services/codeGenerator';
 import { useShipments } from '../contexts/ShipmentContext';
 
 // --- Constants & Data ---
@@ -196,11 +197,13 @@ export const NewShipment: React.FC = () => {
 
   const generateCodes = () => {
     if (isEditMode) return; // Don't regenerate on edit
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const newBLCode = generateBLCode(shipments);
+    const newClientCode = generateClientCode();
+    
     setFormData(prev => ({
       ...prev,
-      code: `BL-${currentYearShort}-${randomSuffix}`,
-      clientCode: `CLT-${Math.floor(Math.random() * 1000)}`
+      code: newBLCode,
+      clientCode: newClientCode
     }));
   };
 
