@@ -1,3 +1,5 @@
+console.log("🔥 TEST UPDATE OK 🔥");
+
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Layout } from './components/Layout';
