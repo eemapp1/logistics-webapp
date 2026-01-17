@@ -348,36 +348,43 @@ export const printReceipt = (shipment: Shipment, type: 'CLIENT' | 'MERCHANT' = '
     }
 
     const html = generateReceiptHTML(shipment, type);
+    
+    // Use innerHTML instead of write for better compatibility
     printWindow.document.open();
     printWindow.document.write(html);
     printWindow.document.close();
 
     // Attendre que le contenu soit chargé avant d'imprimer
-    printWindow.onload = function() {
-      setTimeout(() => {
-        try {
-          printWindow.print();
-          // Ne pas fermer automatiquement pour permettre à l'utilisateur de réimprimer si nécessaire
-          // printWindow.close();
-        } catch (error) {
-          console.error('Erreur lors de l\'impression:', error);
-          alert('Erreur lors de l\'impression. Veuillez réessayer.');
-        }
-      }, 500);
+    const printContent = () => {
+      try {
+        printWindow.print();
+      } catch (error) {
+        console.error('Erreur lors de l\'impression:', error);
+        alert('Erreur lors de l\'impression. Veuillez réessayer.');
+      }
     };
 
-    // Fallback si onload ne se déclenche pas
-    setTimeout(() => {
-      if (printWindow && !printWindow.closed) {
-        try {
-          printWindow.print();
-        } catch (error) {
-          console.error('Erreur lors de l\'impression (fallback):', error);
+    // Vérifier si le document est prêt
+    if (printWindow.document.readyState === 'complete') {
+      setTimeout(printContent, 500);
+    } else {
+      printWindow.onload = function() {
+        setTimeout(printContent, 500);
+      };
+      
+      // Fallback si onload ne se déclenche pas
+      setTimeout(() => {
+        if (printWindow && !printWindow.closed) {
+          printContent();
         }
-      }
-    }, 2000);
+      }, 2000);
+    }
 
   } catch (error) {
+    console.error('Erreur lors de l\'ouverture de la fenêtre d\'impression:', error);
+    alert('Erreur lors de l\'ouverture de la fenêtre d\'impression. Vérifiez que les popups sont autorisés.');
+  }
+};
     console.error('Erreur lors de l\'ouverture de la fenêtre d\'impression:', error);
     alert('Erreur lors de l\'ouverture de la fenêtre d\'impression. Vérifiez que les popups sont autorisés.');
   }
@@ -398,28 +405,30 @@ export const printLabel = (shipment: Shipment) => {
     labelWindow.document.close();
 
     // Attendre que le contenu soit chargé avant d'imprimer
-    labelWindow.onload = function() {
-      setTimeout(() => {
-        try {
-          labelWindow.print();
-          // Ne pas fermer automatiquement
-        } catch (error) {
-          console.error('Erreur lors de l\'impression de l\'étiquette:', error);
-          alert('Erreur lors de l\'impression de l\'étiquette. Veuillez réessayer.');
-        }
-      }, 500);
+    const printContent = () => {
+      try {
+        labelWindow.print();
+      } catch (error) {
+        console.error('Erreur lors de l\'impression de l\'étiquette:', error);
+        alert('Erreur lors de l\'impression de l\'étiquette. Veuillez réessayer.');
+      }
     };
 
-    // Fallback si onload ne se déclenche pas
-    setTimeout(() => {
-      if (labelWindow && !labelWindow.closed) {
-        try {
-          labelWindow.print();
-        } catch (error) {
-          console.error('Erreur lors de l\'impression de l\'étiquette (fallback):', error);
+    // Vérifier si le document est prêt
+    if (labelWindow.document.readyState === 'complete') {
+      setTimeout(printContent, 500);
+    } else {
+      labelWindow.onload = function() {
+        setTimeout(printContent, 500);
+      };
+      
+      // Fallback si onload ne se déclenche pas
+      setTimeout(() => {
+        if (labelWindow && !labelWindow.closed) {
+          printContent();
         }
-      }
-    }, 2000);
+      }, 2000);
+    }
 
   } catch (error) {
     console.error('Erreur lors de l\'ouverture de la fenêtre d\'étiquette:', error);
