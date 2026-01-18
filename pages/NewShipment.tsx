@@ -161,10 +161,13 @@ export const NewShipment: React.FC = () => {
         navigate('/shipments');
       }
     } else {
-      // CREATE MODE
-      generateCodes();
+      // CREATE MODE - Generate new codes
+      // This runs when shipments data is available or changes
+      if (!isEditMode) {
+        generateCodes();
+      }
     }
-  }, [id, shipments, navigate]);
+  }, [id, shipments, navigate, isEditMode]);
 
   // Sync totals
   useEffect(() => {
@@ -197,14 +200,29 @@ export const NewShipment: React.FC = () => {
 
   const generateCodes = () => {
     if (isEditMode) return; // Don't regenerate on edit
-    const newBLCode = generateBLCode(shipments);
-    const newClientCode = generateClientCode();
     
-    setFormData(prev => ({
-      ...prev,
-      code: newBLCode,
-      clientCode: newClientCode
-    }));
+    try {
+      const newBLCode = generateBLCode(shipments || []);
+      const newClientCode = generateClientCode();
+      
+      console.log('Generated BL Code:', newBLCode); // Debug log
+      console.log('Available shipments:', shipments?.length || 0); // Debug log
+      
+      setFormData(prev => ({
+        ...prev,
+        code: newBLCode,
+        clientCode: newClientCode
+      }));
+    } catch (error) {
+      console.error('Error generating codes:', error);
+      // Fallback: use timestamp-based code if generation fails
+      const timestamp = Date.now().toString().slice(-4);
+      setFormData(prev => ({
+        ...prev,
+        code: `BL-${currentYearShort}-${timestamp}`,
+        clientCode: generateClientCode()
+      }));
+    }
   };
 
   // Parcel Management
