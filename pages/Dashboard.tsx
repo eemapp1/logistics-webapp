@@ -35,6 +35,18 @@ const StatCard: React.FC<{ title: string; amount: string; icon: React.ReactNode;
   </div>
 );
 
+const CompactStatCard: React.FC<{ title: string; amount: string; icon: React.ReactNode; color: string }> = ({ title, amount, icon, color }) => (
+  <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3 whitespace-nowrap">
+    <div className={`p-2 rounded-lg ${color} bg-opacity-10 dark:bg-opacity-20 flex-shrink-0`}>
+      {React.cloneElement(icon as React.ReactElement, { className: `${color.replace('bg-', 'text-')} w-5 h-5` })}
+    </div>
+    <div className="min-w-0">
+      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">{title}</p>
+      <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{amount}</h4>
+    </div>
+  </div>
+);
+
 export const Dashboard: React.FC = () => {
   const { shipments, expenses } = useShipments();
   const navigate = useNavigate();
@@ -147,71 +159,73 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* KPI Cards (Dynamic) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <StatCard 
-          title="Solde Caisse (MAD)" 
-          amount={`${stats.cashMAD.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`} 
-          icon={<Banknote size={24} />} 
-          trend="Net"
-          color="bg-emerald-600"
-        />
-        <StatCard 
-          title="Total Espèces (MAD)" 
-          amount={`${stats.cashTotal.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`} 
-          icon={<Wallet size={24} />} 
-          trend="Reçu"
-          color="bg-blue-500"
-        />
-        <StatCard 
-          title="Solde Banque (Total)" 
-          amount={`${stats.totalBank.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
-          icon={<CreditCard size={24} />} 
-          color="bg-blue-500"
-        />
-        <StatCard 
-          title="Fonds Euro (Espèces)" 
-          amount={`${stats.totalEUR.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`} 
-          icon={<Wallet size={24} />} 
-          color="bg-purple-500"
-        />
-        <StatCard 
-          title="Dépenses (Total)" 
-          amount={`${stats.totalExpenses.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`} 
-          icon={<TrendingDown size={24} />} 
-          color="bg-red-500"
-        />
-      </div>
-
-      {/* Main Chart Section */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Flux Financiers (MAD)</h3>
-          <span className="text-xs text-slate-500">6 derniers mois</span>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        {/* LEFT SIDE - KPI Cards Stacked Vertically (Compact) */}
+        <div className="flex flex-col gap-3">
+          <CompactStatCard 
+            title="Solde Caisse (MAD)" 
+            amount={`${stats.cashMAD.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`} 
+            icon={<Banknote size={20} />} 
+            color="bg-emerald-600"
+          />
+          <CompactStatCard 
+            title="Total Espèces (MAD)" 
+            amount={`${stats.cashTotal.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`} 
+            icon={<Wallet size={20} />} 
+            color="bg-blue-500"
+          />
+          <CompactStatCard 
+            title="Solde Banque" 
+            amount={`${stats.totalBank.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
+            icon={<CreditCard size={20} />} 
+            color="bg-blue-500"
+          />
+          <CompactStatCard 
+            title="Fonds Euro" 
+            amount={`${stats.totalEUR.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`} 
+            icon={<Wallet size={20} />} 
+            color="bg-purple-500"
+          />
+          <CompactStatCard 
+            title="Dépenses (Total)" 
+            amount={`${stats.totalExpenses.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`} 
+            icon={<TrendingDown size={20} />} 
+            color="bg-red-500"
+          />
         </div>
-        <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-slate-800" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                itemStyle={{ color: '#1e293b' }}
-              />
-              <Area type="monotone" dataKey="entrees" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" name="Entrées" />
-              <Area type="monotone" dataKey="depenses" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#colorExpense)" name="Dépenses" />
-            </AreaChart>
-          </ResponsiveContainer>
+
+        {/* RIGHT SIDE - Chart */}
+        <div className="lg:col-span-3 bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Flux Financiers (MAD)</h3>
+            <span className="text-xs text-slate-500">6 derniers mois</span>
+          </div>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-slate-800" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                  itemStyle={{ color: '#1e293b' }}
+                />
+                <Area type="monotone" dataKey="entrees" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" name="Entrées" />
+                <Area type="monotone" dataKey="depenses" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#colorExpense)" name="Dépenses" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
