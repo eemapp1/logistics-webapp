@@ -69,7 +69,10 @@ export const generateReceiptHTML = (shipment: Shipment, type: 'CLIENT' | 'MERCHA
       </head>
       <body>
         <div class="header">
-          <div class="company-name">Europe Express Messagerie</div>
+          <div style="text-align: center; margin-bottom: 10px;">
+            <strong style="font-size: 16px; color: #0D3B8D;">EEMtrans</strong>
+            <div style="font-size: 9px; color: #FF9500; margin-top: 2px;">Europe Express Messagerie</div>
+          </div>
           <div class="company-info">
             Agence Sidi Ghanem N°385<br>
             Quartier industriel Marrakech

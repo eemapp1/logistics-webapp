@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Text: EEMtrans -->
+  <text x="10" y="45" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#0D3B8D">EEM</text>
+  <text x="95" y="45" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#FF9500">trans</text>
+  
+  <!-- Decorative flight/arrow element -->
+  <g transform="translate(160, 25)">
+    <!-- Arrow/wing shape -->
+    <path d="M 0 15 Q 8 8 15 0 L 15 10 Q 8 12 0 18 Z" fill="#FF9500" />
+    <line x1="0" y1="15" x2="15" y2="0" stroke="#FF9500" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Subtitle: Europe Express Messagerie -->
+  <text x="10" y="68" font-family="Arial, sans-serif" font-size="11" font-weight="normal" fill="#0D3B8D">Europe Express Messagerie</text>
+</svg>
