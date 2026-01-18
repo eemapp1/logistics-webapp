@@ -106,12 +106,13 @@ const PhoneInput: React.FC<{
 // --- Main Component ---
 
 export const NewShipment: React.FC = () => {
-  const { addShipment, shipments, updateShipment } = useShipments();
+  const { addShipment, shipments, updateShipment, fetchShipments } = useShipments();
   const { id } = useParams(); // Check if we are in Edit Mode
   const navigate = useNavigate();
   const currentYearShort = new Date().getFullYear().toString().slice(-2);
   
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const [formData, setFormData] = useState<Partial<Shipment>>({
     code: '',
@@ -140,34 +141,42 @@ export const NewShipment: React.FC = () => {
   // --- INITIALIZATION ---
 
   useEffect(() => {
+    // Ensure shipments are loaded before generating codes
+    const initializePage = async () => {
+      // Fetch latest shipments from database to ensure we have all data
+      await fetchShipments();
+      setIsInitialized(true);
+    };
+
     if (id) {
       // EDIT MODE
-      const shipmentToEdit = shipments.find(s => s.id === id);
-      if (shipmentToEdit) {
-        setIsEditMode(true);
-        setFormData(shipmentToEdit);
-        setParcels(shipmentToEdit.parcels || []);
-        
-        // Parse Phones
-        const [sCode, ...sNum] = shipmentToEdit.senderPhone.split(' ');
-        setSenderPhoneCode(sCode || '+212');
-        setSenderPhoneNumber(sNum.join(' '));
+      initializePage().then(() => {
+        const shipmentToEdit = shipments.find(s => s.id === id);
+        if (shipmentToEdit) {
+          setIsEditMode(true);
+          setFormData(shipmentToEdit);
+          setParcels(shipmentToEdit.parcels || []);
+          
+          // Parse Phones
+          const [sCode, ...sNum] = shipmentToEdit.senderPhone.split(' ');
+          setSenderPhoneCode(sCode || '+212');
+          setSenderPhoneNumber(sNum.join(' '));
 
-        const [rCode, ...rNum] = shipmentToEdit.receiverPhone.split(' ');
-        setReceiverPhoneCode(rCode || '+33');
-        setReceiverPhoneNumber(rNum.join(' '));
-      } else {
-        alert("Bon introuvable !");
-        navigate('/shipments');
-      }
+          const [rCode, ...rNum] = shipmentToEdit.receiverPhone.split(' ');
+          setReceiverPhoneCode(rCode || '+33');
+          setReceiverPhoneNumber(rNum.join(' '));
+        } else {
+          alert("Bon introuvable !");
+          navigate('/shipments');
+        }
+      });
     } else {
-      // CREATE MODE - Generate new codes
-      // This runs when shipments data is available or changes
-      if (!isEditMode) {
+      // CREATE MODE - Generate new codes after fetching shipments
+      initializePage().then(() => {
         generateCodes();
-      }
+      });
     }
-  }, [id, shipments, navigate, isEditMode]);
+  }, [id, navigate, fetchShipments]);
 
   // Sync totals
   useEffect(() => {
@@ -201,28 +210,18 @@ export const NewShipment: React.FC = () => {
   const generateCodes = () => {
     if (isEditMode) return; // Don't regenerate on edit
     
-    try {
-      const newBLCode = generateBLCode(shipments || []);
-      const newClientCode = generateClientCode();
-      
-      console.log('Generated BL Code:', newBLCode); // Debug log
-      console.log('Available shipments:', shipments?.length || 0); // Debug log
-      
-      setFormData(prev => ({
-        ...prev,
-        code: newBLCode,
-        clientCode: newClientCode
-      }));
-    } catch (error) {
-      console.error('Error generating codes:', error);
-      // Fallback: use timestamp-based code if generation fails
-      const timestamp = Date.now().toString().slice(-4);
-      setFormData(prev => ({
-        ...prev,
-        code: `BL-${currentYearShort}-${timestamp}`,
-        clientCode: generateClientCode()
-      }));
-    }
+    // At this point, shipments should be loaded from the fetchShipments call
+    const newBLCode = generateBLCode(shipments || []);
+    const newClientCode = generateClientCode();
+    
+    console.log('Generated BL Code:', newBLCode);
+    console.log('From shipments count:', shipments?.length || 0);
+    
+    setFormData(prev => ({
+      ...prev,
+      code: newBLCode,
+      clientCode: newClientCode
+    }));
   };
 
   // Parcel Management
