@@ -372,20 +372,20 @@ export const CashRegister: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 pb-10">
+    <div className="flex gap-6 animate-in fade-in duration-500 pb-10">
       
-      {/* Header & Stats - Compact Cards Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* LEFT SIDEBAR - Fixed Sticky */}
+      <div className="w-80 flex-shrink-0 h-fit sticky top-6 space-y-4">
         
-        {/* LEFT SIDE - KPI Cards Stacked Vertically (Compact) */}
-        <div className="flex flex-col gap-3">
+        {/* Stats Cards */}
+        <div className="space-y-3">
           <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3 relative overflow-hidden group">
             <div className="absolute right-0 top-0 h-full w-1 bg-emerald-600"></div>
             <div className="p-2 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg text-emerald-600 dark:text-emerald-400 flex-shrink-0">
               <Wallet size={20} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Solde Caisse (MAD)</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Solde Caisse</p>
               <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.cashMAD.toFixed(2)} DH</h4>
             </div>
           </div>
@@ -395,7 +395,7 @@ export const CashRegister: React.FC = () => {
               <Banknote size={20} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Total Espèces (MAD)</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Espèces (MAD)</p>
               <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.cashTotal.toFixed(2)} DH</h4>
             </div>
           </div>
@@ -415,7 +415,7 @@ export const CashRegister: React.FC = () => {
               <Euro size={20} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Fonds Euro (Info)</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Fonds Euro</p>
               <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.totalEUR.toFixed(2)} €</h4>
             </div>
           </div>
@@ -425,104 +425,104 @@ export const CashRegister: React.FC = () => {
               <TrendingDown size={20} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Dépenses (MAD)</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Dépenses</p>
               <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.totalExpenses.toFixed(2)} DH</h4>
             </div>
           </div>
         </div>
 
-        {/* RIGHT SIDE - Chart */}
-        <div className="lg:col-span-3 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-           <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-slate-900 dark:text-white">Flux Mensuels (Espèces MAD)</h3>
-           </div>
-           <div className="h-64">
-             <ResponsiveContainer width="100%" height="100%">
-               <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={12}>
-                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-slate-800" />
-                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                 <RechartsTooltip 
-                   cursor={{fill: 'transparent'}}
-                   contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                 />
-                 <Bar dataKey="entrees" name="Entrées" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                 <Bar dataKey="depenses" name="Dépenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
-               </BarChart>
-             </ResponsiveContainer>
-           </div>
+        {/* Action Button */}
+        <div className="bg-blue-600 rounded-xl p-4 text-white shadow-lg shadow-blue-900/20">
+          <h3 className="font-bold text-sm mb-2">Nouvelle Dépense</h3>
+          <button 
+            onClick={() => setIsExpenseModalOpen(true)}
+            className="w-full py-2.5 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
+          >
+            <Plus size={18} /> Ajouter
+          </button>
         </div>
 
-        {/* Actions & Tools */}
-        <div className="space-y-4">
-            <div className="bg-blue-600 rounded-xl p-6 text-white shadow-lg shadow-blue-900/20 flex flex-col justify-between h-40">
-               <div>
-                  <h3 className="font-bold text-lg">Nouvelle Dépense</h3>
-                  <p className="text-blue-100 text-sm mt-1">Ajouter une sortie d'argent de la caisse espèces.</p>
-               </div>
-               <button 
-                 onClick={() => setIsExpenseModalOpen(true)}
-                 className="w-full py-2 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
-               >
-                 <Plus size={18} /> Ajouter Dépense
-               </button>
-            </div>
-            
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm h-40 flex flex-col justify-center gap-3">
-               <button 
-                 onClick={handleExport}
-                 className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 font-medium border border-slate-200 dark:border-slate-700"
-               >
-                  <span className="flex items-center gap-2"><FileSpreadsheet size={18} className="text-green-600" /> Export Excel</span>
-                  <Download size={16} />
-               </button>
-               <button 
-                 onClick={handlePrint}
-                 className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 font-medium border border-slate-200 dark:border-slate-700"
-               >
-                  <span className="flex items-center gap-2"><Printer size={18} className="text-slate-600" /> Imprimer Journal</span>
-                  <ArrowUpRight size={16} />
-               </button>
-            </div>
+        {/* Tools */}
+        <div className="space-y-2">
+          <button 
+            onClick={handleExport}
+            className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 font-medium border border-slate-200 dark:border-slate-700 text-sm"
+          >
+            <span className="flex items-center gap-2"><FileSpreadsheet size={16} className="text-green-600" /> Export</span>
+            <Download size={14} />
+          </button>
+          <button 
+            onClick={handlePrint}
+            className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 font-medium border border-slate-200 dark:border-slate-700 text-sm"
+          >
+            <span className="flex items-center gap-2"><Printer size={16} className="text-slate-600" /> Imprimer</span>
+            <ArrowUpRight size={14} />
+          </button>
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 flex flex-col md:flex-row gap-4">
-         <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Rechercher (Code, Client, Motif)..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
-            />
-         </div>
-         <div className="w-full md:w-64">
-           <DateRangePicker startDate={filterDateFrom} endDate={filterDateTo} onChange={(s, e) => { setFilterDateFrom(s); setFilterDateTo(e); }} />
-         </div>
-         <div className="w-full md:w-48 relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-            <select 
-               value={filterType}
-               onChange={(e) => setFilterType(e.target.value)}
-               className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm appearance-none"
-            >
-               <option value="all">Tout voir</option>
-               <option value={TransactionType.INCOME}>Entrées (Encaissements)</option>
-               <option value={TransactionType.EXPENSE}>Dépenses</option>
-            </select>
-         </div>
-         {selectedIds.length > 0 && (
-           <button 
-             onClick={handleDelete}
-             className="px-4 py-2.5 bg-red-100 text-red-600 rounded-lg font-medium hover:bg-red-200 transition-colors flex items-center gap-2"
-           >
-             <Trash2 size={18} /> Supprimer ({selectedIds.length})
-           </button>
-         )}
-      </div>
+      {/* RIGHT SECTION - Main Content */}
+      <div className="flex-1 space-y-6">
+        
+        {/* Chart */}
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-bold text-slate-900 dark:text-white text-sm">Flux Mensuels (Espèces MAD)</h3>
+          </div>
+          <div className="h-40">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={12}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-slate-800" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
+                <RechartsTooltip 
+                  cursor={{fill: 'transparent'}}
+                  contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                />
+                <Bar dataKey="entrees" name="Entrées" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="depenses" name="Dépenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        
+        {/* Toolbar */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 flex flex-col md:flex-row gap-4">
+           <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input 
+                type="text" 
+                placeholder="Rechercher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+              />
+           </div>
+           <div className="w-full md:w-56">
+             <DateRangePicker startDate={filterDateFrom} endDate={filterDateTo} onChange={(s, e) => { setFilterDateFrom(s); setFilterDateTo(e); }} />
+           </div>
+           <div className="w-full md:w-40 relative">
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <select 
+                 value={filterType}
+                 onChange={(e) => setFilterType(e.target.value)}
+                 className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm appearance-none"
+              >
+                 <option value="all">Tout voir</option>
+                 <option value={TransactionType.INCOME}>Entrées</option>
+                 <option value={TransactionType.EXPENSE}>Dépenses</option>
+              </select>
+           </div>
+           {selectedIds.length > 0 && (
+             <button 
+               onClick={handleDelete}
+               className="px-4 py-2.5 bg-red-100 text-red-600 rounded-lg font-medium hover:bg-red-200 transition-colors flex items-center gap-2"
+             >
+               <Trash2 size={18} /> Supprimer ({selectedIds.length})
+             </button>
+           )}
+        </div>
 
       {/* Table */}
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -615,6 +615,7 @@ export const CashRegister: React.FC = () => {
               <div className="p-8 text-center text-slate-400">Aucune donnée trouvée.</div>
            )}
          </div>
+        </div>
       </div>
 
       {/* ADD EXPENSE MODAL */}
