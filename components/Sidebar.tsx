@@ -45,7 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
           <img 
             src="/logo.svg" 
             alt="EEM Transport" 
-            className={`flex-shrink-0 transition-all duration-300 ${isSidebarCollapsed ? 'w-8 h-8' : 'w-10 h-10'}`}
+            className={`flex-shrink-0 transition-all duration-300 ${isSidebarCollapsed ? 'w-12 h-12' : 'w-16 h-16'}`}
           />
           <span className={`font-bold text-white tracking-tight transition-all duration-300 text-sm ${isSidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
             EEM<span className="text-primary-400">trans</span>

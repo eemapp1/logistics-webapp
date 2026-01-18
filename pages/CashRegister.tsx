@@ -374,64 +374,65 @@ export const CashRegister: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       
-      {/* Header & Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4 relative overflow-hidden group">
-            <div className="absolute right-0 top-0 h-full w-1 bg-emerald-600"></div>
-            <div className="p-3 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg text-emerald-600 dark:text-emerald-400">
-               <Wallet size={24} />
-            </div>
-            <div>
-               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Solde Caisse (MAD)</p>
-               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.cashMAD.toFixed(2)} <span className="text-sm font-normal text-slate-400">DH</span></h3>
-            </div>
-         </div>
-
-         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400">
-               <Banknote size={24} />
-            </div>
-            <div>
-               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Total Espèces (MAD)</p>
-               <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.cashTotal.toFixed(2)} <span className="text-sm font-normal text-slate-400">DH</span></h3>
-            </div>
-         </div>
-
-         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400">
-               <CreditCard size={24} />
-            </div>
-            <div>
-               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Banque (Info)</p>
-               <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.totalBank.toFixed(2)}</h3>
-            </div>
-         </div>
-
-         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400">
-               <Euro size={24} />
-            </div>
-            <div>
-               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Fonds Euro (Info)</p>
-               <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.totalEUR.toFixed(2)} €</h3>
-            </div>
-         </div>
-
-         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400">
-               <TrendingDown size={24} />
-            </div>
-            <div>
-               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Dépenses (MAD)</p>
-               <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.totalExpenses.toFixed(2)} <span className="text-sm font-normal text-slate-400">DH</span></h3>
-            </div>
-         </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Header & Stats - Compact Cards Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        {/* Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        {/* LEFT SIDE - KPI Cards Stacked Vertically (Compact) */}
+        <div className="flex flex-col gap-3">
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3 relative overflow-hidden group">
+            <div className="absolute right-0 top-0 h-full w-1 bg-emerald-600"></div>
+            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg text-emerald-600 dark:text-emerald-400 flex-shrink-0">
+              <Wallet size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Solde Caisse (MAD)</p>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.cashMAD.toFixed(2)} DH</h4>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 flex-shrink-0">
+              <Banknote size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Total Espèces (MAD)</p>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.cashTotal.toFixed(2)} DH</h4>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 flex-shrink-0">
+              <CreditCard size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Banque (Info)</p>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.totalBank.toFixed(2)}</h4>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400 flex-shrink-0">
+              <Euro size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Fonds Euro (Info)</p>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.totalEUR.toFixed(2)} €</h4>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+            <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 flex-shrink-0">
+              <TrendingDown size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Dépenses (MAD)</p>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.totalExpenses.toFixed(2)} DH</h4>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE - Chart */}
+        <div className="lg:col-span-3 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
            <div className="flex justify-between items-center mb-6">
               <h3 className="font-bold text-slate-900 dark:text-white">Flux Mensuels (Espèces MAD)</h3>
            </div>
