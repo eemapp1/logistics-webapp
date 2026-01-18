@@ -42,6 +42,7 @@ export const CashRegister: React.FC = () => {
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [detailPopupId, setDetailPopupId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
   // Expense Form State
   const [expenseForm, setExpenseForm] = useState({
@@ -433,25 +434,7 @@ export const CashRegister: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 flex-shrink-0">
-              <CreditCard size={20} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Banque (Info)</p>
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.totalBank.toFixed(2)}</h4>
-            </div>
-          </div>
 
-          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400 flex-shrink-0">
-              <Euro size={20} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Fonds Euro</p>
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.totalEUR.toFixed(2)} €</h4>
-            </div>
-          </div>
 
           <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3">
             <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 flex-shrink-0">
@@ -547,14 +530,7 @@ export const CashRegister: React.FC = () => {
                  <option value={TransactionType.EXPENSE}>Dépenses</option>
               </select>
            </div>
-           {selectedIds.length > 0 && (
-             <button 
-               onClick={handleDelete}
-               className="px-4 py-2.5 bg-red-100 text-red-600 rounded-lg font-medium hover:bg-red-200 transition-colors flex items-center gap-2"
-             >
-               <Trash2 size={18} /> Supprimer ({selectedIds.length})
-             </button>
-           )}
+
         </div>
 
       {/* Table */}
@@ -563,16 +539,10 @@ export const CashRegister: React.FC = () => {
            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
              <thead className="bg-slate-50 dark:bg-slate-950">
                <tr>
-                 <th className="px-4 py-3 w-10"><input type="checkbox" className="rounded border-slate-300" onChange={(e) => {
-                    if (e.target.checked) setSelectedIds(filteredData.map(d => d.id));
-                    else setSelectedIds([]);
-                 }} checked={selectedIds.length === filteredData.length && filteredData.length > 0} /></th>
                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Code</th>
                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Client / Motif</th>
-                 <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Espèces (MAD)</th>
-                 <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider text-slate-400">EUR (Info)</th>
-                 <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider text-slate-400">Banque (Info)</th>
+                 <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Montant</th>
                  <th className="px-4 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Mode</th>
                  <th className="px-4 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                </tr>
@@ -582,11 +552,7 @@ export const CashRegister: React.FC = () => {
                  const isExpense = row.type === TransactionType.EXPENSE;
                  const isSelected = selectedIds.includes(row.id);
                  return (
-                   <tr key={row.id} className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}>
-                     <td className="px-4 py-3"><input type="checkbox" checked={isSelected} onChange={() => {
-                        if (isSelected) setSelectedIds(selectedIds.filter(id => id !== row.id));
-                        else setSelectedIds([...selectedIds, row.id]);
-                     }} className="rounded border-slate-300" /></td>
+                   <tr key={row.id} className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors`}>
                      <td className="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300 font-mono text-xs">{row.date}</td>
                      <td className="px-4 py-3 whitespace-nowrap relative">
                         {row.code !== '-' ? (
@@ -623,42 +589,43 @@ export const CashRegister: React.FC = () => {
                      
                      <td className={`px-4 py-3 text-right font-bold ${isExpense ? 'text-red-600' : 'text-green-600'}`}>
                         {row.amountMAD !== 0 ? (
-                           <span>{isExpense ? '-' : '+'}{row.amountMAD.toFixed(2)}</span>
+                           <span>{isExpense ? '-' : '+'}{row.amountMAD.toFixed(2)} DH</span>
                         ) : <span className="text-slate-300">-</span>}
-                     </td>
-                     
-                     <td className="px-4 py-3 text-right font-medium text-slate-500 dark:text-slate-400">
-                        {row.amountEUR !== 0 ? row.amountEUR.toFixed(2) : <span className="text-slate-200 dark:text-slate-800">-</span>}
-                     </td>
-                     
-                     <td className="px-4 py-3 text-right font-medium text-slate-500 dark:text-slate-400">
-                        {row.amountBank !== 0 ? row.amountBank.toFixed(2) : <span className="text-slate-200 dark:text-slate-800">-</span>}
                      </td>
 
                      <td className="px-4 py-3 text-center">
-                        <span className="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                        <span className="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded whitespace-nowrap">
                            {row.paymentMethod}
                         </span>
                      </td>
-                     <td className="px-4 py-3 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                           {row.type === TransactionType.EXPENSE && (
-                             <button 
-                               onClick={() => handleEditExpense(row.id)}
-                               className="p-1.5 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded transition-colors"
-                               title="Modifier"
-                             >
-                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                             </button>
-                           )}
-                           <button 
-                             onClick={() => handleDeleteRow(row.id)}
-                             className="p-1.5 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
-                             title="Supprimer"
-                           >
-                             <Trash2 size={16} />
-                           </button>
-                        </div>
+                     <td className="px-4 py-3 text-center relative">
+                        <button 
+                          onClick={() => setActionMenuId(actionMenuId === row.id ? null : row.id)}
+                          className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                          title="Actions"
+                        >
+                          <MoreHorizontal size={16} className="text-slate-500" />
+                        </button>
+                        {actionMenuId === row.id && (
+                          <div className="absolute right-0 top-8 z-20 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1 min-w-max">
+                            {row.type === TransactionType.EXPENSE && (
+                              <button 
+                                onClick={() => { handleEditExpense(row.id); setActionMenuId(null); }}
+                                className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center gap-2"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                Modifier
+                              </button>
+                            )}
+                            <button 
+                              onClick={() => { handleDeleteRow(row.id); setActionMenuId(null); }}
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"
+                            >
+                              <Trash2 size={14} />
+                              Supprimer
+                            </button>
+                          </div>
+                        )}
                      </td>
                    </tr>
                  );
