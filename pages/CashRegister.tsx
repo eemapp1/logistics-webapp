@@ -41,6 +41,7 @@ export const CashRegister: React.FC = () => {
   // Modals
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [detailPopupId, setDetailPopupId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Expense Form State
   const [expenseForm, setExpenseForm] = useState({
@@ -194,7 +195,7 @@ export const CashRegister: React.FC = () => {
     if (!expenseForm.amount || !expenseForm.reason) return;
 
     const newExpense: Transaction = {
-      id: Date.now().toString(),
+      id: editingId || Date.now().toString(),
       date: expenseForm.date,
       type: TransactionType.EXPENSE,
       description: expenseForm.description || expenseForm.reason,
@@ -205,7 +206,39 @@ export const CashRegister: React.FC = () => {
 
     addExpense(newExpense);
     setIsExpenseModalOpen(false);
+    setEditingId(null);
     setExpenseForm({ amount: '', reason: '', description: '', date: new Date().toISOString().split('T')[0] });
+  };
+
+  const handleEditExpense = (id: string) => {
+    const expense = expenses.find(e => e.id === id);
+    if (expense) {
+      setExpenseForm({
+        amount: expense.amount.toString(),
+        reason: expense.reason || '',
+        description: expense.description || '',
+        date: expense.date
+      });
+      setEditingId(id);
+      setIsExpenseModalOpen(true);
+    }
+  };
+
+  const handleDeleteRow = (id: string) => {
+    const row = financialData.find(r => r.id === id);
+    if (!row) return;
+
+    const confirmMsg = row.type === TransactionType.EXPENSE 
+      ? `Supprimer cette dépense de ${row.label} (${row.amountMAD.toFixed(2)} DH) ?`
+      : `Supprimer ce colis de ${row.label} (${row.amountMAD.toFixed(2)} DH) ?`;
+
+    if (confirm(confirmMsg)) {
+      if (row.type === TransactionType.EXPENSE) {
+        deleteExpense(id);
+      } else {
+        deleteShipment(id);
+      }
+    }
   };
 
   const handleDelete = () => {
@@ -541,6 +574,7 @@ export const CashRegister: React.FC = () => {
                  <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider text-slate-400">EUR (Info)</th>
                  <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider text-slate-400">Banque (Info)</th>
                  <th className="px-4 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Mode</th>
+                 <th className="px-4 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                </tr>
              </thead>
              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
@@ -606,6 +640,26 @@ export const CashRegister: React.FC = () => {
                            {row.paymentMethod}
                         </span>
                      </td>
+                     <td className="px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                           {row.type === TransactionType.EXPENSE && (
+                             <button 
+                               onClick={() => handleEditExpense(row.id)}
+                               className="p-1.5 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded transition-colors"
+                               title="Modifier"
+                             >
+                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                             </button>
+                           )}
+                           <button 
+                             onClick={() => handleDeleteRow(row.id)}
+                             className="p-1.5 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
+                             title="Supprimer"
+                           >
+                             <Trash2 size={16} />
+                           </button>
+                        </div>
+                     </td>
                    </tr>
                  );
                })}
@@ -618,13 +672,13 @@ export const CashRegister: React.FC = () => {
         </div>
       </div>
 
-      {/* ADD EXPENSE MODAL */}
+      {/* ADD/EDIT EXPENSE MODAL */}
       {isExpenseModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95">
               <div className="flex justify-between items-center mb-6">
-                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">Nouvelle Dépense</h3>
-                 <button onClick={() => setIsExpenseModalOpen(false)}><X size={20} className="text-slate-400" /></button>
+                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">{editingId ? 'Modifier Dépense' : 'Nouvelle Dépense'}</h3>
+                 <button onClick={() => { setIsExpenseModalOpen(false); setEditingId(null); }}><X size={20} className="text-slate-400" /></button>
               </div>
               <form onSubmit={handleAddExpense} className="space-y-4">
                  <div>
@@ -675,7 +729,7 @@ export const CashRegister: React.FC = () => {
                     />
                  </div>
                  <button type="submit" className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors shadow-lg shadow-red-900/20">
-                    Valider la dépense
+                    {editingId ? 'Mettre à jour' : 'Ajouter'} dépense
                  </button>
               </form>
            </div>
