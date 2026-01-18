@@ -19,17 +19,21 @@ const getBrowserPopupInstructions = (): string => {
 
 const generateReceiptCSS = `
   body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 10px; font-size: 12px; color: black; }
-  .header { text-align: center; margin-bottom: 20px; border-bottom: 1px dashed black; padding-bottom: 10px; }
-  .logo { font-weight: bold; font-size: 18px; margin-bottom: 5px; }
-  .title { font-weight: bold; font-size: 14px; text-transform: uppercase; margin: 5px 0; }
+  .header { text-align: center; margin-bottom: 15px; border-bottom: 1px dashed black; padding-bottom: 10px; }
+  .company-name { font-weight: bold; font-size: 14px; margin-bottom: 3px; }
+  .company-info { font-size: 10px; line-height: 1.3; margin-bottom: 5px; }
+  .company-contact { font-size: 9px; margin-bottom: 5px; }
+  .logo { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+  .title { font-weight: bold; font-size: 13px; text-transform: uppercase; margin: 5px 0; }
   .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-  .section { margin-top: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; }
-  .total { font-weight: bold; font-size: 16px; margin-top: 10px; text-align: right; }
-  .sub-total { font-size: 12px; text-align: right; margin-top: 5px; }
-  .footer { margin-top: 30px; text-align: center; font-size: 10px; }
-  .barcode { text-align: center; margin-top: 20px; letter-spacing: 5px; font-weight: bold; font-size: 14px; }
+  .section { margin-top: 12px; border-bottom: 1px dashed #ccc; padding-bottom: 8px; }
+  .total { font-weight: bold; font-size: 15px; margin-top: 8px; text-align: right; }
+  .sub-total { font-size: 11px; text-align: right; margin-top: 4px; }
+  .barcode { text-align: center; margin-top: 15px; letter-spacing: 5px; font-weight: bold; font-size: 13px; }
+  .tracking-info { text-align: center; font-size: 9px; margin-top: 10px; padding: 5px; border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; }
+  .footer { margin-top: 15px; text-align: center; font-size: 9px; }
   .note { border: 1px solid black; padding: 5px; margin-top: 10px; font-size: 10px; font-style: italic;}
-  .parcel-list { margin-top: 5px; font-size: 11px; }
+  .parcel-list { margin-top: 5px; font-size: 10px; }
   .parcel-item { margin-bottom: 2px; padding-left: 5px; border-left: 2px solid #ddd; }
 `;
 
@@ -65,10 +69,20 @@ export const generateReceiptHTML = (shipment: Shipment, type: 'CLIENT' | 'MERCHA
       </head>
       <body>
         <div class="header">
-          <div class="logo">EEM TRANSPORT</div>
-          <div class="title">TICKET ${type === 'CLIENT' ? 'CLIENT' : 'AGENCE'}</div>
-          <div>Agence Centrale</div>
-          <div>${shipment.date || new Date().toLocaleDateString('fr-FR')}</div>
+          <div class="company-name">Europe Express Messagerie</div>
+          <div class="company-info">
+            Agence Sidi Ghanem N°385<br>
+            Quartier industriel Marrakech
+          </div>
+          <div class="company-contact">
+            Tél: +212 6 98 66 59 05<br>
+            Email: europe-express-messagerie@hotmail.fr
+          </div>
+          <div style="margin-top: 8px; border-top: 1px dashed black; padding-top: 8px;">
+            <div class="logo">EEM TRANSPORT</div>
+            <div class="title">TICKET ${type === 'CLIENT' ? 'CLIENT' : 'AGENCE'}</div>
+            <div>${shipment.date || new Date().toLocaleDateString('fr-FR')}</div>
+          </div>
         </div>
 
         <div class="section">
@@ -114,6 +128,12 @@ export const generateReceiptHTML = (shipment: Shipment, type: 'CLIENT' | 'MERCHA
 
         <div class="barcode">
           *${shipment.code}*
+        </div>
+
+        <div class="tracking-info">
+          <strong>Suivez votre colis</strong><br>
+          Utilisez le N° ${shipment.code} sur<br>
+          www.europemessagerie.com
         </div>
 
         <div class="footer">
@@ -381,10 +401,6 @@ export const printReceipt = (shipment: Shipment, type: 'CLIENT' | 'MERCHANT' = '
     }
 
   } catch (error) {
-    console.error('Erreur lors de l\'ouverture de la fenêtre d\'impression:', error);
-    alert('Erreur lors de l\'ouverture de la fenêtre d\'impression. Vérifiez que les popups sont autorisés.');
-  }
-};
     console.error('Erreur lors de l\'ouverture de la fenêtre d\'impression:', error);
     alert('Erreur lors de l\'ouverture de la fenêtre d\'impression. Vérifiez que les popups sont autorisés.');
   }
