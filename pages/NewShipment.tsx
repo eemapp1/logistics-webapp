@@ -126,6 +126,8 @@ export const NewShipment: React.FC = () => {
     paymentMethod: PaymentMethod.CASH
   });
 
+  const [shipmentData, setShipmentData] = useState<Shipment | null>(null);
+
   const [parcels, setParcels] = useState<Parcel[]>([
     { id: '1', type: 'Carton Standard', weight: 0, count: 1, description: '' }
   ]);
@@ -263,13 +265,15 @@ export const NewShipment: React.FC = () => {
       receiverPhone: fullReceiverPhone,
       parcels: parcels,
       packageType: parcels[0]?.type || 'Divers',
-      weight: formData.totalWeight || 0,
-      itemCount: formData.totalItems || 0,
+      totalWeight: formData.totalWeight || 0,
+      totalItems: formData.totalItems || 0,
     };
+
+    setShipmentData(finalData);
 
     if (isEditMode) {
       updateShipment(finalData.id, finalData);
-      setShowSuccessModal(true); // Show modal but slightly different context
+      setShowSuccessModal(true);
     } else {
       addShipment(finalData);
       setShowSuccessModal(true);
@@ -668,7 +672,7 @@ export const NewShipment: React.FC = () => {
 
                  <div className="space-y-3">
                     <button 
-                      onClick={() => printReceipt(formData as Shipment, 'CLIENT')}
+                      onClick={() => shipmentData && printReceipt(shipmentData, 'CLIENT')}
                       className="w-full py-3 px-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between group transition-all"
                     >
                        <div className="flex items-center gap-3">
@@ -679,7 +683,7 @@ export const NewShipment: React.FC = () => {
                     </button>
 
                     <button 
-                      onClick={() => printReceipt(formData as Shipment, 'MERCHANT')}
+                      onClick={() => shipmentData && printReceipt(shipmentData, 'MERCHANT')}
                       className="w-full py-3 px-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between group transition-all"
                     >
                        <div className="flex items-center gap-3">
@@ -690,7 +694,7 @@ export const NewShipment: React.FC = () => {
                     </button>
 
                     <button 
-                      onClick={() => printLabel(formData as Shipment)}
+                      onClick={() => shipmentData && printLabel(shipmentData)}
                       className="w-full py-3 px-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between group transition-all"
                     >
                        <div className="flex items-center gap-3">
