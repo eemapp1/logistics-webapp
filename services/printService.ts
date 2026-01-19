@@ -295,6 +295,7 @@ const generateDriverManifestHTML = (list: DepartureList): string => {
             <th style="width: 150px;">Expéditeur</th>
             <th style="width: 150px;">Destinataire</th>
             <th>Adresse / Détails</th>
+            <th class="col-price">MONTANT CLIENT</th>
             <th class="col-price">À ENCAISSER</th>
           </tr>
         </thead>
@@ -305,6 +306,14 @@ const generateDriverManifestHTML = (list: DepartureList): string => {
             const isCash = s.paymentMethod === PaymentMethod.CASH;
             const isMAD = s.currency === Currency.MAD;
             const isEUR = s.currency === Currency.EUR;
+
+            // Client price display
+            let clientPriceDisplay = "-";
+            if (isCash) {
+              clientPriceDisplay = `${(s.price || 0).toFixed(2)} ${isMAD ? 'MAD' : 'EUR'}`;
+            } else {
+              clientPriceDisplay = `${(s.price || 0).toFixed(2)} ${s.currency} (Banque)`;
+            }
 
             // Discount logic applies to Cash payments only for the driver net amount
             // Bank payments are not collected by driver, so they show as 0 or '-'
@@ -335,6 +344,7 @@ const generateDriverManifestHTML = (list: DepartureList): string => {
                      ${(s.parcels && s.parcels.length > 0) ? s.parcels.map(p => `${p.count || 0}x ${p.type === 'Autre' ? (p.customType || 'Autre') : (p.type || 'N/A')}`).join(', ') : 'Aucun colis'}
                   </span>
                 </td>
+                <td class="col-price">${clientPriceDisplay}</td>
                 <td class="col-price">${priceDisplay}</td>
               </tr>
             `;
@@ -343,6 +353,14 @@ const generateDriverManifestHTML = (list: DepartureList): string => {
       </table>
 
       <div class="footer-stats">
+        <div class="stat-box">
+          <div class="stat-label">TOTAL CLIENT (MAD)</div>
+          <div class="stat-value">${list.shipments.filter(s => s.currency === Currency.MAD && s.paymentMethod === PaymentMethod.CASH).reduce((sum, s) => sum + (s.price || 0), 0).toFixed(2)}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">TOTAL CLIENT (EUR)</div>
+          <div class="stat-value">${list.shipments.filter(s => s.currency === Currency.EUR && s.paymentMethod === PaymentMethod.CASH).reduce((sum, s) => sum + (s.price || 0), 0).toFixed(2)}</div>
+        </div>
         <div class="stat-box">
           <div class="stat-label">TOTAL À ENCAISSER (MAD)</div>
           <div class="stat-value">${(list.totalDriverMAD || 0).toFixed(2)}</div>
