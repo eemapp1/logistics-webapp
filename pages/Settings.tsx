@@ -52,30 +52,43 @@ export const Settings: React.FC = () => {
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.warn('No file selected');
+      return;
+    }
+
+    console.log('File selected:', file.name, file.type, file.size);
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      setLogoUploadError('Veuillez sélectionner une image (PNG, JPG, SVG, etc.)');
+      const errorMsg = 'Veuillez sélectionner une image (PNG, JPG, SVG, etc.)';
+      setLogoUploadError(errorMsg);
+      console.warn(errorMsg);
       return;
     }
 
     // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      setLogoUploadError('Le fichier ne doit pas dépasser 2MB');
+      const errorMsg = 'Le fichier ne doit pas dépasser 2MB';
+      setLogoUploadError(errorMsg);
+      console.warn(errorMsg);
       return;
     }
 
     try {
       setLogoUploadError(null);
+      console.log('Starting logo upload...');
       await uploadLogo(file);
+      console.log('Logo uploaded successfully');
       setLogoUploadSuccess(true);
       setTimeout(() => setLogoUploadSuccess(false), 3000);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     } catch (error) {
-      setLogoUploadError(error instanceof Error ? error.message : 'Erreur lors du chargement du logo');
+      const errorMsg = error instanceof Error ? error.message : 'Erreur lors du chargement du logo';
+      setLogoUploadError(errorMsg);
+      console.error('Logo upload error:', errorMsg, error);
     }
   };
 
@@ -186,6 +199,7 @@ export const Settings: React.FC = () => {
                 />
                 <div className="flex gap-3">
                   <button
+                    type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm flex items-center gap-2"
                   >
@@ -193,6 +207,7 @@ export const Settings: React.FC = () => {
                   </button>
                   {themeSettings.logoUrl && (
                     <button
+                      type="button"
                       onClick={removeLogo}
                       className="px-4 py-2.5 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors font-medium flex items-center gap-2"
                     >

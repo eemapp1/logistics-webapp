@@ -80,21 +80,45 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const uploadLogo = async (file: File) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          const base64 = e.target.result as string;
-          updateThemeSettings({ logoUrl: base64 });
-          resolve();
-        } else {
-          reject(new Error('Erreur lors de la lecture du fichier'));
-        }
-      };
-      reader.onerror = () => {
-        reject(new Error('Erreur lors du chargement du fichier'));
-      };
-      reader.readAsDataURL(file);
+    return new Promise<void>((resolve, reject) => {
+      try {
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+          try {
+            const result = e.target?.result;
+            if (result && typeof result === 'string') {
+              console.log('File read successfully, size:', result.length);
+              updateThemeSettings({ logoUrl: result });
+              console.log('Theme settings updated with logo');
+              resolve();
+            } else {
+              reject(new Error('Erreur lors de la lecture du fichier'));
+            }
+          } catch (error) {
+            console.error('Error in onload handler:', error);
+            reject(error);
+          }
+        };
+        
+        reader.onerror = () => {
+          const errorMsg = 'Erreur lors du chargement du fichier';
+          console.error(errorMsg, reader.error);
+          reject(new Error(errorMsg));
+        };
+        
+        reader.onprogress = (e) => {
+          if (e.lengthComputable) {
+            console.log('Upload progress:', Math.round((e.loaded / e.total) * 100) + '%');
+          }
+        };
+        
+        console.log('Starting FileReader.readAsDataURL for file:', file.name);
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error setting up FileReader:', error);
+        reject(error);
+      }
     });
   };
 
