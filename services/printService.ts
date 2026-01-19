@@ -372,7 +372,7 @@ export const printReceipt = (shipment: Shipment, type: 'CLIENT' | 'MERCHANT' = '
 
     const html = generateReceiptHTML(shipment, type);
     
-    // Use innerHTML instead of write for better compatibility
+    // Write content to the window
     printWindow.document.open();
     printWindow.document.write(html);
     printWindow.document.close();
@@ -380,27 +380,30 @@ export const printReceipt = (shipment: Shipment, type: 'CLIENT' | 'MERCHANT' = '
     // Attendre que le contenu soit chargé avant d'imprimer
     const printContent = () => {
       try {
-        printWindow.print();
+        if (printWindow && !printWindow.closed) {
+          printWindow.focus();
+          printWindow.print();
+        }
       } catch (error) {
         console.error('Erreur lors de l\'impression:', error);
         alert('Erreur lors de l\'impression. Veuillez réessayer.');
       }
     };
 
-    // Vérifier si le document est prêt
+    // Check document readyState and print
     if (printWindow.document.readyState === 'complete') {
-      setTimeout(printContent, 500);
+      setTimeout(printContent, 800);
     } else {
       printWindow.onload = function() {
-        setTimeout(printContent, 500);
+        setTimeout(printContent, 800);
       };
       
-      // Fallback si onload ne se déclenche pas
+      // Fallback timeout
       setTimeout(() => {
         if (printWindow && !printWindow.closed) {
           printContent();
         }
-      }, 2000);
+      }, 3000);
     }
 
   } catch (error) {
@@ -426,27 +429,30 @@ export const printLabel = (shipment: Shipment) => {
     // Attendre que le contenu soit chargé avant d'imprimer
     const printContent = () => {
       try {
-        labelWindow.print();
+        if (labelWindow && !labelWindow.closed) {
+          labelWindow.focus();
+          labelWindow.print();
+        }
       } catch (error) {
         console.error('Erreur lors de l\'impression de l\'étiquette:', error);
         alert('Erreur lors de l\'impression de l\'étiquette. Veuillez réessayer.');
       }
     };
 
-    // Vérifier si le document est prêt
+    // Check document readyState and print
     if (labelWindow.document.readyState === 'complete') {
-      setTimeout(printContent, 500);
+      setTimeout(printContent, 800);
     } else {
       labelWindow.onload = function() {
-        setTimeout(printContent, 500);
+        setTimeout(printContent, 800);
       };
       
-      // Fallback si onload ne se déclenche pas
+      // Fallback timeout
       setTimeout(() => {
         if (labelWindow && !labelWindow.closed) {
           printContent();
         }
-      }, 2000);
+      }, 3000);
     }
 
   } catch (error) {
