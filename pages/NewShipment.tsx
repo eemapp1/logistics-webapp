@@ -178,7 +178,7 @@ export const NewShipment: React.FC = () => {
         generateCodes();
       });
     }
-  }, [id, navigate, fetchShipments]);
+  }, [id, navigate]);
 
   // Sync totals
   useEffect(() => {
