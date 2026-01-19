@@ -19,7 +19,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
-  const { isSidebarCollapsed } = useTheme();
+  const { isSidebarCollapsed, themeSettings } = useTheme();
 
   // Updated colors to match professional theme
   const activeClass = "flex items-center gap-3 px-3 py-2.5 bg-primary-600 text-white rounded-lg transition-all shadow-md shadow-primary-900/20 font-medium";
@@ -42,14 +42,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     >
       <div className="h-16 flex items-center px-6 border-b border-slate-700/50 bg-[#1A2332]">
         <div className="flex items-center gap-2 transition-all duration-300">
-          <img 
-            src="/logo.svg" 
-            alt="EEM Transport" 
-            className={`flex-shrink-0 transition-all duration-300 ${isSidebarCollapsed ? 'w-12 h-12' : 'w-16 h-16'}`}
-          />
-          <span className={`font-bold text-white tracking-tight transition-all duration-300 text-sm ${isSidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
-            EEM<span className="text-primary-400">trans</span>
-          </span>
+          {themeSettings.logoUrl ? (
+            <img 
+              src={themeSettings.logoUrl}
+              alt="Logo" 
+              className={`flex-shrink-0 transition-all duration-300 object-contain ${isSidebarCollapsed ? 'w-12 h-12' : 'w-16 h-16'}`}
+            />
+          ) : (
+            <>
+              <img 
+                src="/logo.svg" 
+                alt="EEM Transport" 
+                className={`flex-shrink-0 transition-all duration-300 ${isSidebarCollapsed ? 'w-12 h-12' : 'w-16 h-16'}`}
+              />
+              <span className={`font-bold text-white tracking-tight transition-all duration-300 text-sm ${isSidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
+                EEM<span className="text-primary-400">trans</span>
+              </span>
+            </>
+          )}
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Save, User as UserIcon, Building2, Lock, Shield, Palette, Check } from 'lucide-react';
+import { Save, User as UserIcon, Building2, Lock, Shield, Palette, Check, Upload, X } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 const SettingsCard: React.FC<{ title: string; description: string; icon: React.ReactNode; children: React.ReactNode }> = ({ title, description, icon, children }) => (
@@ -34,7 +34,10 @@ const StyledInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
 );
 
 export const Settings: React.FC = () => {
-  const { themeSettings, updateThemeSettings, isDarkMode, toggleTheme } = useTheme();
+  const { themeSettings, updateThemeSettings, isDarkMode, toggleTheme, uploadLogo } = useTheme();
+  const [logoUploadError, setLogoUploadError] = React.useState<string | null>(null);
+  const [logoUploadSuccess, setLogoUploadSuccess] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const colors = [
     '#4A90B8', // Default Medical Blue
@@ -46,6 +49,39 @@ export const Settings: React.FC = () => {
     '#8B5CF6', // Violet
     '#EC4899', // Pink
   ];
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setLogoUploadError('Veuillez sélectionner une image (PNG, JPG, SVG, etc.)');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setLogoUploadError('Le fichier ne doit pas dépasser 2MB');
+      return;
+    }
+
+    try {
+      setLogoUploadError(null);
+      await uploadLogo(file);
+      setLogoUploadSuccess(true);
+      setTimeout(() => setLogoUploadSuccess(false), 3000);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      setLogoUploadError(error instanceof Error ? error.message : 'Erreur lors du chargement du logo');
+    }
+  };
+
+  const removeLogo = () => {
+    updateThemeSettings({ logoUrl: undefined });
+  };
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500 pb-10">
@@ -117,6 +153,75 @@ export const Settings: React.FC = () => {
                </div>
             </div>
          </div>
+      </SettingsCard>
+
+      {/* LOGO UPLOAD */}
+      <SettingsCard
+        title="Logo de l'Agence"
+        description="Téléchargez le logo de votre agence qui s'affichera dans la barre latérale. Format recommandé: carré, PNG/JPG, max 2MB."
+        icon={<Upload size={24} />}
+      >
+        <div className="space-y-6">
+          {/* Logo Preview */}
+          <div className="flex items-center gap-6">
+            <div className="flex-shrink-0">
+              <div className="w-24 h-24 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+                {themeSettings.logoUrl ? (
+                  <img src={themeSettings.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <div className="text-center text-slate-400 text-xs font-medium">Pas de logo</div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex-1">
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">Sélectionner un logo</label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm flex items-center gap-2"
+                  >
+                    <Upload size={16} /> Choisir un fichier
+                  </button>
+                  {themeSettings.logoUrl && (
+                    <button
+                      onClick={removeLogo}
+                      className="px-4 py-2.5 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors font-medium flex items-center gap-2"
+                    >
+                      <X size={16} /> Supprimer
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Success Message */}
+              {logoUploadSuccess && (
+                <div className="p-3 bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-800 rounded-lg">
+                  <p className="text-sm text-green-700 dark:text-green-400 font-medium">✓ Logo mis à jour avec succès!</p>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {logoUploadError && (
+                <div className="p-3 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-lg">
+                  <p className="text-sm text-red-700 dark:text-red-400 font-medium">{logoUploadError}</p>
+                </div>
+              )}
+
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
+                Note: Le logo s'affichera uniquement dans la barre latérale. Les tickets conserveront le nom de l'agence défini ci-dessous.
+              </p>
+            </div>
+          </div>
+        </div>
       </SettingsCard>
 
       {/* Agency Information */}

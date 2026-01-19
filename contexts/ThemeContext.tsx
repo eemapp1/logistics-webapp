@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface ThemeSettings {
   primaryColor: string; // Hex code
   fontFamily: string;
+  logoUrl?: string; // Base64 or URL to custom logo
 }
 
 interface ThemeContextType {
@@ -12,6 +13,7 @@ interface ThemeContextType {
   toggleSidebar: () => void;
   themeSettings: ThemeSettings;
   updateThemeSettings: (settings: Partial<ThemeSettings>) => void;
+  uploadLogo: (file: File) => Promise<void>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -77,6 +79,25 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setThemeSettings(prev => ({ ...prev, ...newSettings }));
   };
 
+  const uploadLogo = async (file: File) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          const base64 = e.target.result as string;
+          updateThemeSettings({ logoUrl: base64 });
+          resolve();
+        } else {
+          reject(new Error('Erreur lors de la lecture du fichier'));
+        }
+      };
+      reader.onerror = () => {
+        reject(new Error('Erreur lors du chargement du fichier'));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   return (
     <ThemeContext.Provider value={{ 
       isDarkMode, 
@@ -84,7 +105,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       isSidebarCollapsed, 
       toggleSidebar,
       themeSettings,
-      updateThemeSettings
+      updateThemeSettings,
+      uploadLogo
     }}>
       {children}
     </ThemeContext.Provider>
