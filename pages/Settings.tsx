@@ -171,9 +171,19 @@ export const Settings: React.FC = () => {
       {/* LOGO UPLOAD */}
       <SettingsCard
         title="Logo de l'Agence"
-        description="Téléchargez le logo de votre agence qui s'affichera dans la barre latérale. Format recommandé: carré, PNG/JPG, max 2MB."
+        description="Téléchargez le logo de votre agence qui s'affichera dans la barre latérale."
         icon={<Upload size={24} />}
       >
+        {/* Logo Requirements */}
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
+          <h4 className="font-semibold text-blue-900 dark:text-blue-300 text-sm mb-2">📏 Dimensions recommandées:</h4>
+          <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
+            <li>• <strong>Taille idéale:</strong> 16px × 16px (minimum 64px × 64px)</li>
+            <li>• <strong>Format:</strong> PNG ou SVG avec fond transparent</li>
+            <li>• <strong>Poids max:</strong> 2MB</li>
+            <li>• <strong>Aspect:</strong> Carré (1:1) pour une meilleure qualité</li>
+          </ul>
+        </div>
         <div className="space-y-6">
           {/* Logo Preview */}
           <div className="flex items-center gap-6">
