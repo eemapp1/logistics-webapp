@@ -19,21 +19,17 @@ const getBrowserPopupInstructions = (): string => {
 
 const generateReceiptCSS = `
   body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 10px; font-size: 12px; color: black; }
-  .header { text-align: center; margin-bottom: 15px; border-bottom: 1px dashed black; padding-bottom: 10px; }
-  .company-name { font-weight: bold; font-size: 14px; margin-bottom: 3px; }
-  .company-info { font-size: 10px; line-height: 1.3; margin-bottom: 5px; }
-  .company-contact { font-size: 9px; margin-bottom: 5px; }
-  .logo { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
-  .title { font-weight: bold; font-size: 13px; text-transform: uppercase; margin: 5px 0; }
+  .header { text-align: center; margin-bottom: 20px; border-bottom: 1px dashed black; padding-bottom: 10px; }
+  .logo { font-weight: bold; font-size: 18px; margin-bottom: 5px; }
+  .title { font-weight: bold; font-size: 14px; text-transform: uppercase; margin: 5px 0; }
   .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-  .section { margin-top: 12px; border-bottom: 1px dashed #ccc; padding-bottom: 8px; }
-  .total { font-weight: bold; font-size: 15px; margin-top: 8px; text-align: right; }
-  .sub-total { font-size: 11px; text-align: right; margin-top: 4px; }
-  .barcode { text-align: center; margin-top: 15px; letter-spacing: 5px; font-weight: bold; font-size: 13px; }
-  .tracking-info { text-align: center; font-size: 9px; margin-top: 10px; padding: 5px; border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; }
-  .footer { margin-top: 15px; text-align: center; font-size: 9px; }
+  .section { margin-top: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; }
+  .total { font-weight: bold; font-size: 16px; margin-top: 10px; text-align: right; }
+  .sub-total { font-size: 12px; text-align: right; margin-top: 5px; }
+  .footer { margin-top: 30px; text-align: center; font-size: 10px; }
+  .barcode { text-align: center; margin-top: 20px; letter-spacing: 5px; font-weight: bold; font-size: 14px; }
   .note { border: 1px solid black; padding: 5px; margin-top: 10px; font-size: 10px; font-style: italic;}
-  .parcel-list { margin-top: 5px; font-size: 10px; }
+  .parcel-list { margin-top: 5px; font-size: 11px; }
   .parcel-item { margin-bottom: 2px; padding-left: 5px; border-left: 2px solid #ddd; }
 `;
 
@@ -69,23 +65,10 @@ export const generateReceiptHTML = (shipment: Shipment, type: 'CLIENT' | 'MERCHA
       </head>
       <body>
         <div class="header">
-          <div style="text-align: center; margin-bottom: 10px;">
-            <strong style="font-size: 16px; color: #0D3B8D;">EEMtrans</strong>
-            <div style="font-size: 9px; color: #FF9500; margin-top: 2px;">Europe Express Messagerie</div>
-          </div>
-          <div class="company-info">
-            Agence Sidi Ghanem N°385<br>
-            Quartier industriel Marrakech
-          </div>
-          <div class="company-contact">
-            Tél: +212 6 98 66 59 05<br>
-            Email: europe-express-messagerie@hotmail.fr
-          </div>
-          <div style="margin-top: 8px; border-top: 1px dashed black; padding-top: 8px;">
-            <div class="logo">EEM TRANSPORT</div>
-            <div class="title">TICKET ${type === 'CLIENT' ? 'CLIENT' : 'AGENCE'}</div>
-            <div>${shipment.date || new Date().toLocaleDateString('fr-FR')}</div>
-          </div>
+          <div class="logo">EEM TRANSPORT</div>
+          <div class="title">TICKET ${type === 'CLIENT' ? 'CLIENT' : 'AGENCE'}</div>
+          <div>Agence Centrale</div>
+          <div>${shipment.date || new Date().toLocaleDateString('fr-FR')}</div>
         </div>
 
         <div class="section">
@@ -131,12 +114,6 @@ export const generateReceiptHTML = (shipment: Shipment, type: 'CLIENT' | 'MERCHA
 
         <div class="barcode">
           *${shipment.code}*
-        </div>
-
-        <div class="tracking-info">
-          <strong>Suivez votre colis</strong><br>
-          Utilisez le N° ${shipment.code} sur<br>
-          www.europemessagerie.com
         </div>
 
         <div class="footer">
@@ -295,7 +272,6 @@ const generateDriverManifestHTML = (list: DepartureList): string => {
             <th style="width: 150px;">Expéditeur</th>
             <th style="width: 150px;">Destinataire</th>
             <th>Adresse / Détails</th>
-            <th class="col-price">MONTANT CLIENT</th>
             <th class="col-price">À ENCAISSER</th>
           </tr>
         </thead>
@@ -306,14 +282,6 @@ const generateDriverManifestHTML = (list: DepartureList): string => {
             const isCash = s.paymentMethod === PaymentMethod.CASH;
             const isMAD = s.currency === Currency.MAD;
             const isEUR = s.currency === Currency.EUR;
-
-            // Client price display
-            let clientPriceDisplay = "-";
-            if (isCash) {
-              clientPriceDisplay = `${(s.price || 0).toFixed(2)} ${isMAD ? 'MAD' : 'EUR'}`;
-            } else {
-              clientPriceDisplay = `${(s.price || 0).toFixed(2)} ${s.currency} (Banque)`;
-            }
 
             // Discount logic applies to Cash payments only for the driver net amount
             // Bank payments are not collected by driver, so they show as 0 or '-'
@@ -344,7 +312,6 @@ const generateDriverManifestHTML = (list: DepartureList): string => {
                      ${(s.parcels && s.parcels.length > 0) ? s.parcels.map(p => `${p.count || 0}x ${p.type === 'Autre' ? (p.customType || 'Autre') : (p.type || 'N/A')}`).join(', ') : 'Aucun colis'}
                   </span>
                 </td>
-                <td class="col-price">${clientPriceDisplay}</td>
                 <td class="col-price">${priceDisplay}</td>
               </tr>
             `;
@@ -353,14 +320,6 @@ const generateDriverManifestHTML = (list: DepartureList): string => {
       </table>
 
       <div class="footer-stats">
-        <div class="stat-box">
-          <div class="stat-label">TOTAL CLIENT (MAD)</div>
-          <div class="stat-value">${list.shipments.filter(s => s.currency === Currency.MAD && s.paymentMethod === PaymentMethod.CASH).reduce((sum, s) => sum + (s.price || 0), 0).toFixed(2)}</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">TOTAL CLIENT (EUR)</div>
-          <div class="stat-value">${list.shipments.filter(s => s.currency === Currency.EUR && s.paymentMethod === PaymentMethod.CASH).reduce((sum, s) => sum + (s.price || 0), 0).toFixed(2)}</div>
-        </div>
         <div class="stat-box">
           <div class="stat-label">TOTAL À ENCAISSER (MAD)</div>
           <div class="stat-value">${(list.totalDriverMAD || 0).toFixed(2)}</div>
@@ -389,40 +348,34 @@ export const printReceipt = (shipment: Shipment, type: 'CLIENT' | 'MERCHANT' = '
     }
 
     const html = generateReceiptHTML(shipment, type);
-    
-    // Write content to the window
     printWindow.document.open();
     printWindow.document.write(html);
     printWindow.document.close();
 
     // Attendre que le contenu soit chargé avant d'imprimer
-    const printContent = () => {
-      try {
-        if (printWindow && !printWindow.closed) {
-          printWindow.focus();
+    printWindow.onload = function() {
+      setTimeout(() => {
+        try {
           printWindow.print();
+          // Ne pas fermer automatiquement pour permettre à l'utilisateur de réimprimer si nécessaire
+          // printWindow.close();
+        } catch (error) {
+          console.error('Erreur lors de l\'impression:', error);
+          alert('Erreur lors de l\'impression. Veuillez réessayer.');
         }
-      } catch (error) {
-        console.error('Erreur lors de l\'impression:', error);
-        alert('Erreur lors de l\'impression. Veuillez réessayer.');
-      }
+      }, 500);
     };
 
-    // Check document readyState and print
-    if (printWindow.document.readyState === 'complete') {
-      setTimeout(printContent, 800);
-    } else {
-      printWindow.onload = function() {
-        setTimeout(printContent, 800);
-      };
-      
-      // Fallback timeout
-      setTimeout(() => {
-        if (printWindow && !printWindow.closed) {
-          printContent();
+    // Fallback si onload ne se déclenche pas
+    setTimeout(() => {
+      if (printWindow && !printWindow.closed) {
+        try {
+          printWindow.print();
+        } catch (error) {
+          console.error('Erreur lors de l\'impression (fallback):', error);
         }
-      }, 3000);
-    }
+      }
+    }, 2000);
 
   } catch (error) {
     console.error('Erreur lors de l\'ouverture de la fenêtre d\'impression:', error);
@@ -445,33 +398,28 @@ export const printLabel = (shipment: Shipment) => {
     labelWindow.document.close();
 
     // Attendre que le contenu soit chargé avant d'imprimer
-    const printContent = () => {
-      try {
-        if (labelWindow && !labelWindow.closed) {
-          labelWindow.focus();
+    labelWindow.onload = function() {
+      setTimeout(() => {
+        try {
           labelWindow.print();
+          // Ne pas fermer automatiquement
+        } catch (error) {
+          console.error('Erreur lors de l\'impression de l\'étiquette:', error);
+          alert('Erreur lors de l\'impression de l\'étiquette. Veuillez réessayer.');
         }
-      } catch (error) {
-        console.error('Erreur lors de l\'impression de l\'étiquette:', error);
-        alert('Erreur lors de l\'impression de l\'étiquette. Veuillez réessayer.');
-      }
+      }, 500);
     };
 
-    // Check document readyState and print
-    if (labelWindow.document.readyState === 'complete') {
-      setTimeout(printContent, 800);
-    } else {
-      labelWindow.onload = function() {
-        setTimeout(printContent, 800);
-      };
-      
-      // Fallback timeout
-      setTimeout(() => {
-        if (labelWindow && !labelWindow.closed) {
-          printContent();
+    // Fallback si onload ne se déclenche pas
+    setTimeout(() => {
+      if (labelWindow && !labelWindow.closed) {
+        try {
+          labelWindow.print();
+        } catch (error) {
+          console.error('Erreur lors de l\'impression de l\'étiquette (fallback):', error);
         }
-      }, 3000);
-    }
+      }
+    }, 2000);
 
   } catch (error) {
     console.error('Erreur lors de l\'ouverture de la fenêtre d\'étiquette:', error);

@@ -48,7 +48,6 @@ interface ShipmentContextType {
   fetchExpenses: () => void;
   fetchDepartureLists: () => void;
   addShipment: (shipment: Shipment) => void;
-  updateShipment: (id: string, shipment: Shipment) => void;
   addClient: (client: Client) => void;
   addExpense: (expense: Transaction) => void;
   addDepartureList: (list: DepartureList) => Promise<DepartureList>;
@@ -188,47 +187,6 @@ export const ShipmentProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  // ---------- UPDATE SHIPMENT ----------
-  const updateShipment = async (id: string, shipment: Shipment) => {
-    const dbShipment: any = {
-      code: shipment.code,
-      client_code: shipment.clientCode,
-      sender_name: shipment.senderName,
-      sender_phone: shipment.senderPhone,
-      sender_id: shipment.senderId,
-      receiver_name: shipment.receiverName,
-      receiver_phone: shipment.receiverPhone,
-      receiver_address: shipment.receiverAddress,
-      zip_code: shipment.zipCode,
-      city: shipment.city,
-      parcels: shipment.parcels,
-      total_weight: shipment.totalWeight,
-      total_items: shipment.totalItems,
-      price: shipment.price,
-      currency: shipment.currency,
-      advance_amount: shipment.advanceAmount,
-      remaining_amount: shipment.remainingAmount,
-      payment_method: shipment.paymentMethod,
-      payment_status: shipment.paymentStatus,
-      note: shipment.note
-    };
-
-    if (shipment.date) {
-      dbShipment.date = shipment.date;
-    }
-
-    console.log('Updating shipment:', id, dbShipment);
-
-    const { data, error } = await supabase.from('shipments').update(dbShipment).eq('id', id).select();
-    if (error) {
-      console.error("Erreur mise à jour colis:", error);
-      alert("Erreur lors de la mise à jour du colis !");
-    } else {
-      const updatedShipment = { ...shipment, id };
-      setShipments(prev => prev.map(s => s.id === id ? updatedShipment : s));
-    }
-  };
-
   // ---------- ADD CLIENT ----------
   const addClient = async (client: Client) => {
     const { id, created_at, ...clientData } = client;
@@ -355,7 +313,7 @@ export const ShipmentProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   return (
-    <ShipmentContext.Provider value={{ shipments, clients, expenses, departureLists, fetchShipments, fetchClients, fetchExpenses, fetchDepartureLists, addShipment, updateShipment, addClient, addExpense, addDepartureList, updateDepartureList, deleteDepartureList, deleteExpense, deleteShipment }}>
+    <ShipmentContext.Provider value={{ shipments, clients, expenses, departureLists, fetchShipments, fetchClients, fetchExpenses, fetchDepartureLists, addShipment, addClient, addExpense, addDepartureList, updateDepartureList, deleteDepartureList, deleteExpense, deleteShipment }}>
       {children}
     </ShipmentContext.Provider>
   );

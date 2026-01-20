@@ -36,10 +36,6 @@ export const DepartureListManager: React.FC = () => {
   // --- MODAL STATES ---
   const [viewList, setViewList] = useState<DepartureList | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  
-  // --- INLINE PRICE EDITING ---
-  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
-  const [editedPrices, setEditedPrices] = useState<{ [key: string]: number }>({});
 
   // --- SEARCH LOGIC ---
   const searchResults = useMemo(() => {
@@ -80,23 +76,22 @@ export const DepartureListManager: React.FC = () => {
           const isCash = s.paymentMethod === PaymentMethod.CASH;
           const isMAD = s.currency === Currency.MAD;
           const isEUR = s.currency === Currency.EUR;
-          const price = editedPrices[s.id] ?? s.price; // Use edited price if available
 
           if (isCash) {
              if (isMAD) {
-                totalMAD += price;
-                const d = price * (discount / 100);
+                totalMAD += s.price;
+                const d = s.price * (discount / 100);
                 discountMAD += d;
-                driverMAD += (price - d);
+                driverMAD += (s.price - d);
              } else if (isEUR) {
-                totalEUR += price;
-                const d = price * (discount / 100);
+                totalEUR += s.price;
+                const d = s.price * (discount / 100);
                 discountEUR += d;
-                driverEUR += (price - d);
+                driverEUR += (s.price - d);
              }
           } else {
              // Bank payments - Internal info only, usually driver collects 0
-             bankTotal += price;
+             bankTotal += s.price;
           }
        }
     });
@@ -111,7 +106,7 @@ export const DepartureListManager: React.FC = () => {
        driverEUR,
        checkedCount
     };
-  }, [selectedShipments, checkedIds, discountPercent, editedPrices]);
+  }, [selectedShipments, checkedIds, discountPercent]);
 
   // Helper to calculate row specific driver price
   const getRowDriverPrice = (s: Shipment) => {
@@ -121,8 +116,7 @@ export const DepartureListManager: React.FC = () => {
      if (!isCash) return { net: 0, currency: s.currency };
 
      const discount = parseFloat(discountPercent) || 0;
-     const price = editedPrices[s.id] ?? s.price; // Use edited price if available
-     const net = price * (1 - discount / 100);
+     const net = s.price * (1 - discount / 100);
 
      return { net, currency: s.currency };
   };
@@ -194,10 +188,7 @@ export const DepartureListManager: React.FC = () => {
     const discountVal = parseFloat(discountPercent) || 0;
 
     // Filter actual shipments to save (only checked ones per prompt requirements)
-    const finalShipments = selectedShipments.filter(s => checkedIds.has(s.id)).map(s => ({
-      ...s,
-      price: editedPrices[s.id] ?? s.price // Apply edited prices if any
-    }));
+    const finalShipments = selectedShipments.filter(s => checkedIds.has(s.id));
 
     // Generate unique code
     const dateStr = departureDate.replace(/-/g, ''); // YYYYMMDD from picker
@@ -413,57 +404,16 @@ export const DepartureListManager: React.FC = () => {
                                       <div className="text-[10px] text-slate-500 truncate max-w-[100px]">{s.receiverAddress}</div>
                                    </td>
 
-                                   {/* Consolidated Client Price - with inline editing */}
+                                   {/* Consolidated Client Price */}
                                    <td className="px-3 py-3 text-right">
                                       {isCash ? (
-                                        <div className="space-y-1">
-                                          {editingPriceId === s.id ? (
-                                            <div className="inline-flex items-center gap-1">
-                                              <input
-                                                type="number"
-                                                step="0.01"
-                                                value={editedPrices[s.id] ?? s.price}
-                                                onChange={(e) => setEditedPrices(prev => ({...prev, [s.id]: parseFloat(e.target.value) || 0}))}
-                                                autoFocus
-                                                className="w-16 bg-blue-50 dark:bg-blue-900/30 border border-blue-500 rounded px-2 py-1 text-xs font-bold text-blue-600 dark:text-blue-400"
-                                              />
-                                              <button
-                                                onClick={() => {
-                                                  const newPrice = editedPrices[s.id] ?? s.price;
-                                                  setSelectedShipments(prev => prev.map(sh => sh.id === s.id ? {...sh, price: newPrice} : sh));
-                                                  setEditingPriceId(null);
-                                                }}
-                                                className="p-0.5 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/20 rounded"
-                                              >
-                                                <CheckCircle2 size={16} />
-                                              </button>
-                                              <button
-                                                onClick={() => setEditingPriceId(null)}
-                                                className="p-0.5 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded"
-                                              >
-                                                <X size={16} />
-                                              </button>
-                                            </div>
-                                          ) : (
-                                            <div className="inline-flex items-center gap-2 group">
-                                              <div className="flex flex-col items-end">
-                                                <span className="font-bold text-sm text-slate-700 dark:text-white">{(editedPrices[s.id] ?? s.price).toFixed(2)}</span>
-                                                <span className="text-[9px] text-slate-400">
-                                                  {isMAD ? 'MAD' : 'EUR'}
-                                                </span>
-                                              </div>
-                                              <button
-                                                onClick={() => {
-                                                  setEditingPriceId(s.id);
-                                                  setEditedPrices(prev => ({...prev, [s.id]: editedPrices[s.id] ?? s.price}));
-                                                }}
-                                                className="p-1 text-slate-400 group-hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded opacity-0 group-hover:opacity-100 transition-all"
-                                                title="Éditer le prix"
-                                              >
-                                                <Edit2 size={14} />
-                                              </button>
-                                            </div>
-                                          )}
+                                        <div className="inline-flex items-center gap-2">
+                                           <span className="font-bold text-sm text-slate-700 dark:text-white">{s.price.toFixed(2)}</span>
+                                           {isMAD ? (
+                                              <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold border border-emerald-200 dark:border-emerald-800">MAD</span>
+                                           ) : (
+                                              <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-[10px] font-bold border border-blue-200 dark:border-blue-800">EUR</span>
+                                           )}
                                         </div>
                                       ) : (
                                          <div className="flex flex-col items-end">

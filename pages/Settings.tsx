@@ -37,6 +37,7 @@ export const Settings: React.FC = () => {
   const { themeSettings, updateThemeSettings, isDarkMode, toggleTheme, uploadLogo } = useTheme();
   const [logoUploadError, setLogoUploadError] = React.useState<string | null>(null);
   const [logoUploadSuccess, setLogoUploadSuccess] = React.useState(false);
+  const [isDragOver, setIsDragOver] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const colors = [
@@ -94,6 +95,32 @@ export const Settings: React.FC = () => {
 
   const removeLogo = () => {
     updateThemeSettings({ logoUrl: undefined });
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      const changeEvent = {
+        target: { files: e.dataTransfer.files }
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
+      await handleLogoUpload(changeEvent);
+    }
   };
 
   return (

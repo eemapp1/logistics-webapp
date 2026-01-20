@@ -41,8 +41,6 @@ export const CashRegister: React.FC = () => {
   // Modals
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [detailPopupId, setDetailPopupId] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
   // Expense Form State
   const [expenseForm, setExpenseForm] = useState({
@@ -196,7 +194,7 @@ export const CashRegister: React.FC = () => {
     if (!expenseForm.amount || !expenseForm.reason) return;
 
     const newExpense: Transaction = {
-      id: editingId || Date.now().toString(),
+      id: Date.now().toString(),
       date: expenseForm.date,
       type: TransactionType.EXPENSE,
       description: expenseForm.description || expenseForm.reason,
@@ -207,39 +205,7 @@ export const CashRegister: React.FC = () => {
 
     addExpense(newExpense);
     setIsExpenseModalOpen(false);
-    setEditingId(null);
     setExpenseForm({ amount: '', reason: '', description: '', date: new Date().toISOString().split('T')[0] });
-  };
-
-  const handleEditExpense = (id: string) => {
-    const expense = expenses.find(e => e.id === id);
-    if (expense) {
-      setExpenseForm({
-        amount: expense.amount.toString(),
-        reason: expense.reason || '',
-        description: expense.description || '',
-        date: expense.date
-      });
-      setEditingId(id);
-      setIsExpenseModalOpen(true);
-    }
-  };
-
-  const handleDeleteRow = (id: string) => {
-    const row = financialData.find(r => r.id === id);
-    if (!row) return;
-
-    const confirmMsg = row.type === TransactionType.EXPENSE 
-      ? `Supprimer cette dépense de ${row.label} (${row.amountMAD.toFixed(2)} DH) ?`
-      : `Supprimer ce colis de ${row.label} (${row.amountMAD.toFixed(2)} DH) ?`;
-
-    if (confirm(confirmMsg)) {
-      if (row.type === TransactionType.EXPENSE) {
-        deleteExpense(id);
-      } else {
-        deleteShipment(id);
-      }
-    }
   };
 
   const handleDelete = () => {
@@ -406,132 +372,156 @@ export const CashRegister: React.FC = () => {
   };
 
   return (
-    <div className="flex gap-6 animate-in fade-in duration-500 pb-10">
+    <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       
-      {/* LEFT SIDEBAR - Fixed Sticky */}
-      <div className="w-80 flex-shrink-0 h-fit sticky top-6 space-y-4">
+      {/* Header & Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4 relative overflow-hidden group">
+            <div className="absolute right-0 top-0 h-full w-1 bg-green-500"></div>
+            <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400">
+               <Wallet size={24} />
+            </div>
+            <div>
+               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Solde Caisse (MAD)</p>
+               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.cashMAD.toFixed(2)} <span className="text-sm font-normal text-slate-400">DH</span></h3>
+            </div>
+         </div>
+
+         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400">
+               <Banknote size={24} />
+            </div>
+            <div>
+               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Total Espèces (MAD)</p>
+               <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.cashTotal.toFixed(2)} <span className="text-sm font-normal text-slate-400">DH</span></h3>
+            </div>
+         </div>
+
+         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400">
+               <CreditCard size={24} />
+            </div>
+            <div>
+               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Banque (Info)</p>
+               <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.totalBank.toFixed(2)}</h3>
+            </div>
+         </div>
+
+         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
+            <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400">
+               <Euro size={24} />
+            </div>
+            <div>
+               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Fonds Euro (Info)</p>
+               <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.totalEUR.toFixed(2)} €</h3>
+            </div>
+         </div>
+
+         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
+            <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400">
+               <TrendingDown size={24} />
+            </div>
+            <div>
+               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Dépenses (MAD)</p>
+               <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">{globalStats.totalExpenses.toFixed(2)} <span className="text-sm font-normal text-slate-400">DH</span></h3>
+            </div>
+         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Stats Cards */}
-        <div className="space-y-3">
-          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3 relative overflow-hidden group">
-            <div className="absolute right-0 top-0 h-full w-1 bg-emerald-600"></div>
-            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg text-emerald-600 dark:text-emerald-400 flex-shrink-0">
-              <Wallet size={20} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Solde Caisse</p>
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.cashMAD.toFixed(2)} DH</h4>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 flex-shrink-0">
-              <Banknote size={20} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Espèces (MAD)</p>
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.cashTotal.toFixed(2)} DH</h4>
-            </div>
-          </div>
-
-
-
-          <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-            <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 flex-shrink-0">
-              <TrendingDown size={20} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Dépenses</p>
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{globalStats.totalExpenses.toFixed(2)} DH</h4>
-            </div>
-          </div>
+        {/* Chart */}
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+           <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-slate-900 dark:text-white">Flux Mensuels (Espèces MAD)</h3>
+           </div>
+           <div className="h-64">
+             <ResponsiveContainer width="100%" height="100%">
+               <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={12}>
+                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-slate-800" />
+                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                 <RechartsTooltip 
+                   cursor={{fill: 'transparent'}}
+                   contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                 />
+                 <Bar dataKey="entrees" name="Entrées" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                 <Bar dataKey="depenses" name="Dépenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
+               </BarChart>
+             </ResponsiveContainer>
+           </div>
         </div>
 
-        {/* Action Button */}
-        <div className="bg-blue-600 rounded-xl p-4 text-white shadow-lg shadow-blue-900/20">
-          <h3 className="font-bold text-sm mb-2">Nouvelle Dépense</h3>
-          <button 
-            onClick={() => setIsExpenseModalOpen(true)}
-            className="w-full py-2.5 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
-          >
-            <Plus size={18} /> Ajouter
-          </button>
-        </div>
-
-        {/* Tools */}
-        <div className="space-y-2">
-          <button 
-            onClick={handleExport}
-            className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 font-medium border border-slate-200 dark:border-slate-700 text-sm"
-          >
-            <span className="flex items-center gap-2"><FileSpreadsheet size={16} className="text-green-600" /> Export</span>
-            <Download size={14} />
-          </button>
-          <button 
-            onClick={handlePrint}
-            className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 font-medium border border-slate-200 dark:border-slate-700 text-sm"
-          >
-            <span className="flex items-center gap-2"><Printer size={16} className="text-slate-600" /> Imprimer</span>
-            <ArrowUpRight size={14} />
-          </button>
+        {/* Actions & Tools */}
+        <div className="space-y-4">
+            <div className="bg-blue-600 rounded-xl p-6 text-white shadow-lg shadow-blue-900/20 flex flex-col justify-between h-40">
+               <div>
+                  <h3 className="font-bold text-lg">Nouvelle Dépense</h3>
+                  <p className="text-blue-100 text-sm mt-1">Ajouter une sortie d'argent de la caisse espèces.</p>
+               </div>
+               <button 
+                 onClick={() => setIsExpenseModalOpen(true)}
+                 className="w-full py-2 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+               >
+                 <Plus size={18} /> Ajouter Dépense
+               </button>
+            </div>
+            
+            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm h-40 flex flex-col justify-center gap-3">
+               <button 
+                 onClick={handleExport}
+                 className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 font-medium border border-slate-200 dark:border-slate-700"
+               >
+                  <span className="flex items-center gap-2"><FileSpreadsheet size={18} className="text-green-600" /> Export Excel</span>
+                  <Download size={16} />
+               </button>
+               <button 
+                 onClick={handlePrint}
+                 className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 font-medium border border-slate-200 dark:border-slate-700"
+               >
+                  <span className="flex items-center gap-2"><Printer size={18} className="text-slate-600" /> Imprimer Journal</span>
+                  <ArrowUpRight size={16} />
+               </button>
+            </div>
         </div>
       </div>
 
-      {/* RIGHT SECTION - Main Content */}
-      <div className="flex-1 space-y-6">
-        
-        {/* Chart */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-slate-900 dark:text-white text-sm">Flux Mensuels (Espèces MAD)</h3>
-          </div>
-          <div className="h-40">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={12}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-slate-800" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 11}} />
-                <RechartsTooltip 
-                  cursor={{fill: 'transparent'}}
-                  contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                />
-                <Bar dataKey="entrees" name="Entrées" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="depenses" name="Dépenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        
-        {/* Toolbar */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 flex flex-col md:flex-row gap-4">
-           <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Rechercher..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
-              />
-           </div>
-           <div className="w-full md:w-56">
-             <DateRangePicker startDate={filterDateFrom} endDate={filterDateTo} onChange={(s, e) => { setFilterDateFrom(s); setFilterDateTo(e); }} />
-           </div>
-           <div className="w-full md:w-40 relative">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-              <select 
-                 value={filterType}
-                 onChange={(e) => setFilterType(e.target.value)}
-                 className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm appearance-none"
-              >
-                 <option value="all">Tout voir</option>
-                 <option value={TransactionType.INCOME}>Entrées</option>
-                 <option value={TransactionType.EXPENSE}>Dépenses</option>
-              </select>
-           </div>
-
-        </div>
+      {/* Toolbar */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 flex flex-col md:flex-row gap-4">
+         <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Rechercher (Code, Client, Motif)..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+            />
+         </div>
+         <div className="w-full md:w-64">
+           <DateRangePicker startDate={filterDateFrom} endDate={filterDateTo} onChange={(s, e) => { setFilterDateFrom(s); setFilterDateTo(e); }} />
+         </div>
+         <div className="w-full md:w-48 relative">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <select 
+               value={filterType}
+               onChange={(e) => setFilterType(e.target.value)}
+               className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm appearance-none"
+            >
+               <option value="all">Tout voir</option>
+               <option value={TransactionType.INCOME}>Entrées (Encaissements)</option>
+               <option value={TransactionType.EXPENSE}>Dépenses</option>
+            </select>
+         </div>
+         {selectedIds.length > 0 && (
+           <button 
+             onClick={handleDelete}
+             className="px-4 py-2.5 bg-red-100 text-red-600 rounded-lg font-medium hover:bg-red-200 transition-colors flex items-center gap-2"
+           >
+             <Trash2 size={18} /> Supprimer ({selectedIds.length})
+           </button>
+         )}
+      </div>
 
       {/* Table */}
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -539,12 +529,17 @@ export const CashRegister: React.FC = () => {
            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
              <thead className="bg-slate-50 dark:bg-slate-950">
                <tr>
+                 <th className="px-4 py-3 w-10"><input type="checkbox" className="rounded border-slate-300" onChange={(e) => {
+                    if (e.target.checked) setSelectedIds(filteredData.map(d => d.id));
+                    else setSelectedIds([]);
+                 }} checked={selectedIds.length === filteredData.length && filteredData.length > 0} /></th>
                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Code</th>
                  <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Client / Motif</th>
-                 <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Montant</th>
+                 <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Espèces (MAD)</th>
+                 <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider text-slate-400">EUR (Info)</th>
+                 <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider text-slate-400">Banque (Info)</th>
                  <th className="px-4 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Mode</th>
-                 <th className="px-4 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                </tr>
              </thead>
              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
@@ -552,7 +547,11 @@ export const CashRegister: React.FC = () => {
                  const isExpense = row.type === TransactionType.EXPENSE;
                  const isSelected = selectedIds.includes(row.id);
                  return (
-                   <tr key={row.id} className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors`}>
+                   <tr key={row.id} className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}>
+                     <td className="px-4 py-3"><input type="checkbox" checked={isSelected} onChange={() => {
+                        if (isSelected) setSelectedIds(selectedIds.filter(id => id !== row.id));
+                        else setSelectedIds([...selectedIds, row.id]);
+                     }} className="rounded border-slate-300" /></td>
                      <td className="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300 font-mono text-xs">{row.date}</td>
                      <td className="px-4 py-3 whitespace-nowrap relative">
                         {row.code !== '-' ? (
@@ -589,43 +588,22 @@ export const CashRegister: React.FC = () => {
                      
                      <td className={`px-4 py-3 text-right font-bold ${isExpense ? 'text-red-600' : 'text-green-600'}`}>
                         {row.amountMAD !== 0 ? (
-                           <span>{isExpense ? '-' : '+'}{row.amountMAD.toFixed(2)} DH</span>
+                           <span>{isExpense ? '-' : '+'}{row.amountMAD.toFixed(2)}</span>
                         ) : <span className="text-slate-300">-</span>}
+                     </td>
+                     
+                     <td className="px-4 py-3 text-right font-medium text-slate-500 dark:text-slate-400">
+                        {row.amountEUR !== 0 ? row.amountEUR.toFixed(2) : <span className="text-slate-200 dark:text-slate-800">-</span>}
+                     </td>
+                     
+                     <td className="px-4 py-3 text-right font-medium text-slate-500 dark:text-slate-400">
+                        {row.amountBank !== 0 ? row.amountBank.toFixed(2) : <span className="text-slate-200 dark:text-slate-800">-</span>}
                      </td>
 
                      <td className="px-4 py-3 text-center">
-                        <span className="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded whitespace-nowrap">
+                        <span className="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
                            {row.paymentMethod}
                         </span>
-                     </td>
-                     <td className="px-4 py-3 text-center relative">
-                        <button 
-                          onClick={() => setActionMenuId(actionMenuId === row.id ? null : row.id)}
-                          className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
-                          title="Actions"
-                        >
-                          <MoreHorizontal size={16} className="text-slate-500" />
-                        </button>
-                        {actionMenuId === row.id && (
-                          <div className="absolute right-0 top-8 z-20 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1 min-w-max">
-                            {row.type === TransactionType.EXPENSE && (
-                              <button 
-                                onClick={() => { handleEditExpense(row.id); setActionMenuId(null); }}
-                                className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center gap-2"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                Modifier
-                              </button>
-                            )}
-                            <button 
-                              onClick={() => { handleDeleteRow(row.id); setActionMenuId(null); }}
-                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"
-                            >
-                              <Trash2 size={14} />
-                              Supprimer
-                            </button>
-                          </div>
-                        )}
                      </td>
                    </tr>
                  );
@@ -636,16 +614,15 @@ export const CashRegister: React.FC = () => {
               <div className="p-8 text-center text-slate-400">Aucune donnée trouvée.</div>
            )}
          </div>
-        </div>
       </div>
 
-      {/* ADD/EDIT EXPENSE MODAL */}
+      {/* ADD EXPENSE MODAL */}
       {isExpenseModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95">
               <div className="flex justify-between items-center mb-6">
-                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">{editingId ? 'Modifier Dépense' : 'Nouvelle Dépense'}</h3>
-                 <button onClick={() => { setIsExpenseModalOpen(false); setEditingId(null); }}><X size={20} className="text-slate-400" /></button>
+                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">Nouvelle Dépense</h3>
+                 <button onClick={() => setIsExpenseModalOpen(false)}><X size={20} className="text-slate-400" /></button>
               </div>
               <form onSubmit={handleAddExpense} className="space-y-4">
                  <div>
@@ -696,7 +673,7 @@ export const CashRegister: React.FC = () => {
                     />
                  </div>
                  <button type="submit" className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors shadow-lg shadow-red-900/20">
-                    {editingId ? 'Mettre à jour' : 'Ajouter'} dépense
+                    Valider la dépense
                  </button>
               </form>
            </div>
