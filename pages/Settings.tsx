@@ -168,64 +168,111 @@ export const Settings: React.FC = () => {
          </div>
       </SettingsCard>
 
-      {/* LOGO UPLOAD */}
+      {/* LOGO/BRAND NAME SECTION */}
       <SettingsCard
-        title="Logo de l'Agence"
-        description="Téléchargez le logo de votre agence qui s'affichera dans la barre latérale."
+        title="Logo ou Nom de Marque"
+        description="Choisissez d'afficher soit un logo, soit un nom de marque dans la barre latérale."
         icon={<Upload size={24} />}
       >
         {/* Logo Requirements */}
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-6">
           <h4 className="font-semibold text-blue-900 dark:text-blue-300 text-sm mb-2">📏 Dimensions recommandées:</h4>
           <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
-            <li>• <strong>Taille idéale:</strong> 16px × 16px (minimum 64px × 64px)</li>
+            <li>• <strong>Taille d'affichage:</strong> 80px × 80px</li>
             <li>• <strong>Format:</strong> PNG ou SVG avec fond transparent</li>
             <li>• <strong>Poids max:</strong> 2MB</li>
             <li>• <strong>Aspect:</strong> Carré (1:1) pour une meilleure qualité</li>
           </ul>
         </div>
-        <div className="space-y-6">
-          {/* Logo Preview */}
-          <div className="flex items-center gap-6">
-            <div className="flex-shrink-0">
-              <div className="w-24 h-24 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
-                {themeSettings.logoUrl ? (
+
+        {/* Mode Selection */}
+        <InputGroup label="Mode d'affichage">
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="displayMode"
+                checked={!themeSettings.useBrandName}
+                onChange={() => updateThemeSettings({ useBrandName: false })}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Logo</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="displayMode"
+                checked={themeSettings.useBrandName}
+                onChange={() => updateThemeSettings({ useBrandName: true })}
+                className="w-4 h-4"
+              />
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Nom de marque</span>
+            </label>
+          </div>
+        </InputGroup>
+
+        {/* Brand Name Input */}
+        {themeSettings.useBrandName && (
+          <InputGroup label="Nom de marque / Slug">
+            <StyledInput
+              type="text"
+              value={themeSettings.brandName || ''}
+              onChange={(e) => updateThemeSettings({ brandName: e.target.value })}
+              placeholder="ex: EEMtrans, MyBrand, Logistics..."
+              maxLength={30}
+            />
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Affichera {themeSettings.brandName ? `"${themeSettings.brandName}"` : 'le nom saisi'} dans la barre latérale</p>
+          </InputGroup>
+        )}
+
+        {/* Logo Upload Section */}
+        <div className="mt-8">
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-4">Télécharger un logo</label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleLogoUpload}
+            className="hidden"
+          />
+
+          {/* Logo Preview with Clickable Upload Area */}
+          <div className="flex gap-6 items-start">
+            {/* Upload Area with + Icon */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="w-28 h-28 flex-shrink-0 border-2 border-dashed border-primary-400 dark:border-primary-600 bg-primary-50 dark:bg-primary-950/30 rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary-100 dark:hover:bg-primary-950/50 transition-colors group"
+            >
+              {themeSettings.logoUrl && !themeSettings.useBrandName ? (
+                <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-md">
                   <img src={themeSettings.logoUrl} alt="Logo" className="w-full h-full object-contain" />
-                ) : (
-                  <div className="text-center text-slate-400 text-xs font-medium">Pas de logo</div>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex-1">
-              <div className="mb-4">
-                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">Sélectionner un logo</label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoUpload}
-                  className="hidden"
-                />
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm flex items-center gap-2"
-                  >
-                    <Upload size={16} /> Choisir un fichier
-                  </button>
-                  {themeSettings.logoUrl && (
-                    <button
-                      type="button"
-                      onClick={removeLogo}
-                      className="px-4 py-2.5 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors font-medium flex items-center gap-2"
-                    >
-                      <X size={16} /> Supprimer
-                    </button>
-                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                    <span className="text-white text-3xl font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="text-center">
+                  <span className="text-4xl text-primary-500 dark:text-primary-400 font-light">+</span>
+                  <p className="text-xs text-primary-600 dark:text-primary-400 mt-1 font-medium">Logo</p>
+                </div>
+              )}
+            </div>
+
+            {/* Info and Controls */}
+            <div className="flex-1">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                Cliquez sur le carré ci-dessus pour télécharger un logo ou remplacer le logo actuel.
+              </p>
+
+              {themeSettings.logoUrl && !themeSettings.useBrandName && (
+                <button
+                  type="button"
+                  onClick={removeLogo}
+                  className="px-4 py-2.5 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors font-medium flex items-center gap-2"
+                >
+                  <X size={16} /> Supprimer le logo
+                </button>
+              )}
 
               {/* Success Message */}
               {logoUploadSuccess && (

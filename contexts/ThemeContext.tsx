@@ -4,6 +4,8 @@ interface ThemeSettings {
   primaryColor: string; // Hex code
   fontFamily: string;
   logoUrl?: string; // Base64 or URL to custom logo
+  brandName?: string; // Brand name/slug to display
+  useBrandName?: boolean; // Use brand name instead of logo
 }
 
 interface ThemeContextType {
